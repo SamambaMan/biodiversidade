@@ -41,7 +41,7 @@ class VAdminPrefs(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     fullname = models.CharField(max_length=255, blank=True, null=True)
     active = models.NullBooleanField()
-    id = models.SmallIntegerField(blank=True, null=True)
+    id = models.SmallIntegerField(primary_key=True)
     style_box = models.CharField(max_length=40, blank=True, null=True)
     style = models.CharField(max_length=40, blank=True, null=True)
     lang = models.CharField(max_length=2, blank=True, null=True)
@@ -106,7 +106,7 @@ class VCcaResults(models.Model):
 
 
 class VCompound(models.Model):
-    sampleid = models.IntegerField(blank=True, null=True)
+    sampleid = models.IntegerField(primary_key=True)
     origin_sampleid = models.IntegerField(blank=True, null=True)
     opeid = models.IntegerField(blank=True, null=True)
     isolationdate = models.DateField(blank=True, null=True)

@@ -50,9 +50,9 @@ def importacao(request):
 
             try:
                 novo.save()
-            except Exception, error:
+            except Exception as error:
                 saida += str(conta) + " -- " + error.message + " -- " + linha 
-                print str(conta) + " -- " + error.message + " -- " + linha 
+                print(str(conta) + " -- " + error.message + " -- " + linha) 
 
     else:
         return HttpResponse("Apenas metodo post aceito")
