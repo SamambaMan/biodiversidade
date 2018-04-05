@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'listagens',
+    'extractadata',
 ]
 
 STATICFILES_FINDERS = [
@@ -82,11 +83,11 @@ WSGI_APPLICATION = 'biodiversidade.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'acalanto192837',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -132,4 +133,18 @@ USE_TZ = True
 STATIC_URL = '/biodiversidade/static/'
 
 
-STATIC_ROOT = '/opt/biodiversidade/static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+if "AMBIENTE" in os.environ and os.environ["AMBIENTE"] == "producao":
+    # Parametros para rodar no heroku
+    # DEBUG = False
+    STATIC_URL = 'https://storage.googleapis.com/extractadata-static/static/'
+    DATABASES = {
+    'default': {
+      'ENGINE': 'django.db.backends.postgresql',
+      'HOST': os.environ['DB_HOST'],
+      'PORT': os.environ['DB_PORT'],
+      'NAME': os.environ['DB_NAME'],
+      'USER': os.environ['DB_USER'],
+      'PASSWORD': os.environ['DB_PASSWORD']
+    }}

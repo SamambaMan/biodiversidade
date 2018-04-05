@@ -22,9 +22,9 @@ from django.views.generic import RedirectView
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^$', admin.site.urls),
     url(r'^importacao/', importacao),
-    url(r'^$', RedirectView.as_view(url='/biodiversidade/admin/')),
+    #url(r'^$', RedirectView.as_view(url='/biodiversidade/admin/')),
 ]
 
     
