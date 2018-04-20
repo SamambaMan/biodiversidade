@@ -10,6 +10,24 @@ from __future__ import unicode_literals
 from django.db import models
 
 
+class VPlatePlant(models.Model):
+    tlcplateid = models.IntegerField(blank=True, null=True)
+    quantity = models.FloatField(blank=True, null=True)
+    lane = models.SmallIntegerField(blank=True, null=True)
+    col = models.SmallIntegerField(blank=True, null=True)
+    classname = models.CharField(max_length=80, blank=True, null=True)
+    tlc_compoundtype = models.SmallIntegerField(blank=True, null=True)
+    family = models.CharField(max_length=80, blank=True, null=True)
+    genus = models.CharField(max_length=80, blank=True, null=True)
+    species = models.CharField(max_length=80, blank=True, null=True)
+    common = models.CharField(max_length=80, blank=True, null=True)
+    result = models.NullBooleanField()
+
+    class Meta:
+        managed = False
+        db_table = 'v_plate_plant'
+
+
 class VActiveExpedTplant(models.Model):
     expedid = models.IntegerField(blank=True, null=True)
     tplantid = models.IntegerField(blank=True, null=True)
