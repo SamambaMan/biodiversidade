@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="sample.erd" time="201806171130">
+	<entities>
+		<data-source id="postgresql_generic-163a96de4ad-52f8804ca9ffa4e1">
+			<entity id="1" name="sample" fq-name="public.sample" order="0" x="340" y="60">
+				<path name="public"/>
+			</entity>
+			<entity id="2" name="aplantorgan" fq-name="public.aplantorgan" order="1" x="80" y="100">
+				<path name="public"/>
+			</entity>
+			<entity id="3" name="cca_results" fq-name="public.cca_results" order="2" x="200" y="300">
+				<path name="public"/>
+			</entity>
+			<entity id="4" name="compound" fq-name="public.compound" order="3" x="320" y="380">
+				<path name="public"/>
+			</entity>
+			<entity id="5" name="fraction" fq-name="public.fraction" order="4" x="460" y="380">
+				<path name="public"/>
+			</entity>
+			<entity id="6" name="fractionation" fq-name="public.fractionation" order="5" x="600" y="380">
+				<path name="public"/>
+			</entity>
+			<entity id="7" name="hit_selection" fq-name="public.hit_selection" order="6" x="780" y="340">
+				<path name="public"/>
+			</entity>
+			<entity id="8" name="insect" fq-name="public.insect" order="7" x="400" y="-380">
+				<path name="public"/>
+			</entity>
+			<entity id="9" name="lcms" fq-name="public.lcms" order="8" x="80" y="-520">
+				<path name="public"/>
+			</entity>
+			<entity id="10" name="microorganism" fq-name="public.microorganism" order="9" x="620" y="-380">
+				<path name="public"/>
+			</entity>
+			<entity id="11" name="plate_pos" fq-name="public.plate_pos" order="10" x="500" y="-380">
+				<path name="public"/>
+			</entity>
+			<entity id="12" name="project_choose_hits2" fq-name="public.project_choose_hits2" order="11" x="760" y="-380">
+				<path name="public"/>
+			</entity>
+			<entity id="13" name="project_sample_list" fq-name="public.project_sample_list" order="12" x="1080" y="200">
+				<path name="public"/>
+			</entity>
+			<entity id="14" name="sample_processing" fq-name="public.sample_processing" order="13" x="940" y="-280">
+				<path name="public"/>
+			</entity>
+			<entity id="15" name="sample_tracker" fq-name="public.sample_tracker" order="14" x="1120" y="-460">
+				<path name="public"/>
+			</entity>
+			<entity id="16" name="tlcdata" fq-name="public.tlcdata" order="15" x="220" y="-400">
+				<path name="public"/>
+			</entity>
+			<entity id="17" name="tplantorgan" fq-name="public.tplantorgan" order="16" x="1380" y="0">
+				<path name="public"/>
+			</entity>
+			<entity id="18" name="tplant" fq-name="public.tplant" order="17" x="1320" y="440">
+				<path name="public"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="aplantorgan_sampleid_fkey" fq-name="public.aplantorgan.aplantorgan_sampleid_fkey" type="fk" pk-ref="2" fk-ref="1"/>
+		<relation name="cca_results_sampleid_fkey" fq-name="public.cca_results.cca_results_sampleid_fkey" type="fk" pk-ref="3" fk-ref="1"/>
+		<relation name="compound_origin_sampleid_fkey" fq-name="public.compound.compound_origin_sampleid_fkey" type="fk" pk-ref="4" fk-ref="1"/>
+		<relation name="compound_sampleid_fkey" fq-name="public.compound.compound_sampleid_fkey" type="fk" pk-ref="4" fk-ref="1"/>
+		<relation name="fraction_sampleid_fkey" fq-name="public.fraction.fraction_sampleid_fkey" type="fk" pk-ref="5" fk-ref="1"/>
+		<relation name="fraction_fractionationid_fkey" fq-name="public.fraction.fraction_fractionationid_fkey" type="fk" pk-ref="5" fk-ref="6"/>
+		<relation name="fractionation_pfssampleid_fkey" fq-name="public.fractionation.fractionation_pfssampleid_fkey" type="fk" pk-ref="6" fk-ref="1"/>
+		<relation name="hit_selection_sampleid_fkey" fq-name="public.hit_selection.hit_selection_sampleid_fkey" type="fk" pk-ref="7" fk-ref="1"/>
+		<relation name="hit_selection_src_pfssampleid_fkey" fq-name="public.hit_selection.hit_selection_src_pfssampleid_fkey" type="fk" pk-ref="7" fk-ref="1"/>
+		<relation name="hit_selection_src_tplantid_fkey" fq-name="public.hit_selection.hit_selection_src_tplantid_fkey" type="fk" pk-ref="7" fk-ref="18"/>
+		<relation name="insect_sampleid_fkey" fq-name="public.insect.insect_sampleid_fkey" type="fk" pk-ref="8" fk-ref="1"/>
+		<relation name="lcms_sampleid_fkey" fq-name="public.lcms.lcms_sampleid_fkey" type="fk" pk-ref="9" fk-ref="1"/>
+		<relation name="microorganism_sampleid_fkey" fq-name="public.microorganism.microorganism_sampleid_fkey" type="fk" pk-ref="10" fk-ref="1"/>
+		<relation name="plate_pos_sampleid_fkey" fq-name="public.plate_pos.plate_pos_sampleid_fkey" type="fk" pk-ref="11" fk-ref="1"/>
+		<relation name="project_choose_hits2_sampleid_fkey" fq-name="public.project_choose_hits2.project_choose_hits2_sampleid_fkey" type="fk" pk-ref="12" fk-ref="1"/>
+		<relation name="project_choose_hits2_src_sampleid_fkey" fq-name="public.project_choose_hits2.project_choose_hits2_src_sampleid_fkey" type="fk" pk-ref="12" fk-ref="1"/>
+		<relation name="project_sample_list_sampleid_fkey" fq-name="public.project_sample_list.project_sample_list_sampleid_fkey" type="fk" pk-ref="13" fk-ref="1"/>
+		<relation name="project_sample_list_src_sampleid_fkey" fq-name="public.project_sample_list.project_sample_list_src_sampleid_fkey" type="fk" pk-ref="13" fk-ref="1"/>
+		<relation name="project_sample_list_src_tplantid_fkey" fq-name="public.project_sample_list.project_sample_list_src_tplantid_fkey" type="fk" pk-ref="13" fk-ref="18"/>
+		<relation name="sample_processing_sampleid_fkey" fq-name="public.sample_processing.sample_processing_sampleid_fkey" type="fk" pk-ref="14" fk-ref="1"/>
+		<relation name="sample_tracker_sampleid_fkey" fq-name="public.sample_tracker.sample_tracker_sampleid_fkey" type="fk" pk-ref="15" fk-ref="1"/>
+		<relation name="tlcdata_sampleid_fkey" fq-name="public.tlcdata.tlcdata_sampleid_fkey" type="fk" pk-ref="16" fk-ref="1"/>
+		<relation name="tplantorgan_sampleid_fkey" fq-name="public.tplantorgan.tplantorgan_sampleid_fkey" type="fk" pk-ref="17" fk-ref="1"/>
+		<relation name="tplantorgan_tplantid_fkey" fq-name="public.tplantorgan.tplantorgan_tplantid_fkey" type="fk" pk-ref="17" fk-ref="18"/>
+	</relations>
+	<notes/>
+</diagram>

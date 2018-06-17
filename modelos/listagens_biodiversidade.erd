@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="listagens_biodiversidade.erd" time="201806171141">
+	<entities>
+		<data-source id="postgresql_generic-163a96de4ad-52f8804ca9ffa4e1">
+			<entity id="1" name="listagens_biodiversidade" fq-name="public.listagens_biodiversidade" order="0" x="20" y="20">
+				<path name="public"/>
+			</entity>
+			<entity id="2" name="estacoes" fq-name="public.estacoes" order="1" x="240" y="20">
+				<path name="public"/>
+			</entity>
+			<entity id="3" name="especies" fq-name="public.especies" order="2" x="400" y="20">
+				<path name="public"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="listagens_biodiversidade -&gt; estacoes" type="erdkey" pk-ref="2" fk-ref="1"/>
+	</relations>
+	<notes/>
+</diagram>

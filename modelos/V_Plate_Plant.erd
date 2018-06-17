@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="V_Plate_Plant.erd" time="201806171120">
+	<entities>
+		<data-source id="postgresql_generic-163a96de4ad-52f8804ca9ffa4e1">
+			<entity id="1" name="v_plate_plant" fq-name="public.v_plate_plant" order="0" x="440" y="20">
+				<path name="public"/>
+			</entity>
+			<entity id="2" name="tlcdata" fq-name="public.tlcdata" order="1" x="20" y="440">
+				<path name="public"/>
+			</entity>
+			<entity id="3" name="chemical_classes" fq-name="public.chemical_classes" order="2" x="260" y="440">
+				<path name="public"/>
+			</entity>
+			<entity id="4" name="sample" fq-name="public.sample" order="3" x="260" y="540">
+				<path name="public"/>
+			</entity>
+			<entity id="5" name="tplantorgan" fq-name="public.tplantorgan" order="4" x="440" y="360">
+				<path name="public"/>
+			</entity>
+			<entity id="6" name="tplant" fq-name="public.tplant" order="5" x="620" y="80">
+				<path name="public"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="tlcdata_sampleid_fkey" fq-name="public.tlcdata.tlcdata_sampleid_fkey" type="fk" pk-ref="2" fk-ref="4"/>
+		<relation name="tlcdata -&gt; chemical_classes" type="erdkey" pk-ref="3" fk-ref="2"/>
+		<relation name="tplantorgan_sampleid_fkey" fq-name="public.tplantorgan.tplantorgan_sampleid_fkey" type="fk" pk-ref="5" fk-ref="4"/>
+		<relation name="tplantorgan_tplantid_fkey" fq-name="public.tplantorgan.tplantorgan_tplantid_fkey" type="fk" pk-ref="5" fk-ref="6"/>
+	</relations>
+	<notes>
+		<note order="6" x="20" y="20" w="401" h="401"> SELECT row_number() OVER (ORDER BY tlcdata.tlcplateid, smp.sampleid) AS id,
+    tlcdata.tlcplateid,
+    tlcdata.quantity,
+    tlcdata.lane,
+    tlcdata.col,
+    che.classname,
+    tlcdata.tlc_compoundtype,
+    tpl.family,
+    tpl.genus,
+    tpl.species,
+    tpl.common,
+    tlcdata.result
+   FROM ((((tlcdata
+     JOIN chemical_classes che ON ((che.chemclassid = tlcdata.chemclassid)))
+     JOIN sample smp ON ((smp.sampleid = tlcdata.sampleid)))
+     JOIN tplantorgan tpo ON ((tpo.sampleid = smp.sampleid)))
+     JOIN tplant tpl ON ((tpl.tplantid = tpo.tplantid)));</note>
+	</notes>
+</diagram>

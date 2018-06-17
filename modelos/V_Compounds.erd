@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="V_Compounds.erd" time="201806171114">
+	<entities>
+		<data-source id="postgresql_generic-163a96de4ad-52f8804ca9ffa4e1">
+			<entity id="1" name="v_compound" fq-name="public.v_compound" order="0" x="380" y="40">
+				<path name="public"/>
+			</entity>
+			<entity id="2" name="compound" fq-name="public.compound" order="1" x="520" y="40">
+				<path name="public"/>
+			</entity>
+			<entity id="3" name="people" fq-name="public.people" order="2" x="680" y="40">
+				<path name="public"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="compound_depid_fkey" fq-name="public.compound.compound_depid_fkey" type="fk" pk-ref="2" fk-ref="3"/>
+		<relation name="compound_opeid_fkey" fq-name="public.compound.compound_opeid_fkey" type="fk" pk-ref="2" fk-ref="3"/>
+	</relations>
+	<notes>
+		<note order="3" x="20" y="40" w="340" h="620"> SELECT c.sampleid,
+    c.origin_sampleid,
+    c.opeid,
+    c.isolationdate,
+    c.depid,
+    c.notes,
+    c.active,
+    c.remove,
+    c.purity_pct,
+    c.purity_notes,
+    c.quantity,
+    c.volume,
+    c.solvent,
+    c.mw,
+    c.formula,
+    c.name_common,
+    c.name_iupac,
+    c.smiles,
+    c.init,
+    c.initdate,
+    c.edit,
+    c.editdate,
+    ( SELECT people.last
+           FROM people
+          WHERE (people.peopleid = c.opeid)) AS operator,
+    ( SELECT people.last
+           FROM people
+          WHERE (people.peopleid = c.depid)) AS depositor
+   FROM compound c;</note>
+	</notes>
+</diagram>
