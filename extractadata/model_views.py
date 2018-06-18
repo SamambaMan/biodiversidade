@@ -124,6 +124,7 @@ class VCcaResults(models.Model):
 
 
 class VCompound(models.Model):
+    "Estrutura de consulta de compostos"
     sampleid = models.IntegerField(primary_key=True)
     origin_sampleid = models.IntegerField(blank=True, null=True)
     opeid = models.IntegerField(blank=True, null=True)

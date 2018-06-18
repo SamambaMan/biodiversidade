@@ -28,4 +28,42 @@ class Biodiversidade(models.Model):
     repid = models.CharField(max_length=200, null=True, blank=True, verbose_name="RepID", help_text="repid")
     clustername = models.CharField(max_length=500, null=True, blank=True, verbose_name="Cluster Name", help_text="clustername")
     obs = models.CharField(max_length=1000, null=True, blank=True, verbose_name="Obs", help_text="obs")
+    station = models.CharField(max_length=255, blank=True, null=True)
+    lat = models.FloatField(blank=True, null=True)
+    long = models.FloatField(blank=True, null=True)
+    original_seq_code = models.CharField(max_length=255, blank=True, null=True)
+    source = models.CharField(max_length=255, blank=True, null=True)
+    lat2 = models.FloatField(blank=True, null=True)
+    long2 = models.FloatField(blank=True, null=True)
+    frequency = models.IntegerField(blank=True, null=True)
+    string1 = models.CharField(max_length=255, blank=True, null=True)
+    string2 = models.CharField(max_length=255, blank=True, null=True)
+    string3 = models.CharField(max_length=255, blank=True, null=True)
+    string4 = models.CharField(max_length=255, blank=True, null=True)
+
+class Estacoes(models.Model):
+    id = models.CharField(verbose_name="id", max_length=255, primary_key=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    profundidade = models.TextField(blank=True, null=True)
+    hshannon = models.FloatField(blank=True, null=True)
+    parametro_2 = models.FloatField(blank=True, null=True)
+    parametro_3 = models.FloatField(blank=True, null=True)
+    parametro_4 = models.FloatField(blank=True, null=True)
+    parametro_5 = models.FloatField(blank=True, null=True)
+    parametro_6 = models.FloatField(blank=True, null=True)
+    parametro_7 = models.FloatField(blank=True, null=True)
+    parametro_8 = models.FloatField(blank=True, null=True)
+    parametro_9 = models.FloatField(blank=True, null=True)
+    parametro_10 = models.FloatField(blank=True, null=True)
+    parametro_11 = models.FloatField(blank=True, null=True)
+    total = models.FloatField(blank=True, null=True)
+    classificacao = models.TextField(blank=True, null=True)
+    fonte = models.TextField(blank=True, null=True)
+    color = models.TextField(blank=True, null=True)
+    data = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'estacoes'
 
