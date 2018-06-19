@@ -67,3 +67,31 @@ class Estacoes(models.Model):
         managed = False
         db_table = 'estacoes'
 
+
+class Especies(models.Model):
+    row_names = models.TextField(db_column='row.names', blank=True, null=True)
+    cod = models.FloatField(db_column='COD', blank=True, null=True)
+    item_taxonomico = models.NullBooleanField(db_column='Item Taxonomico')
+    código_item_taxonomico = models.NullBooleanField(db_column='Código Item Taxonomico')
+    item_taxonomico_superior = models.NullBooleanField(db_column='Item Taxonomico Superior')
+    codigo_item_taxononico_superior = models.NullBooleanField(db_column='Codigo Item Taxononico Superior')
+    nome_atribuido = models.TextField(db_column='Nome Atribuido', blank=True, null=True)
+    filo = models.TextField(db_column='Filo', blank=True, null=True)
+    classe = models.TextField(db_column='Classe', blank=True, null=True)
+    ordem = models.TextField(db_column='Ordem', blank=True, null=True)
+    familia = models.TextField(db_column='Familia', blank=True, null=True)
+    genero = models.NullBooleanField(db_column='Genero')
+    especie = models.TextField(db_column='Especie', blank=True, null=True)
+    fonte = models.TextField(db_column='Fonte', blank=True, null=True)
+    amostras = models.TextField(db_column='Amostras', blank=True, null=True)
+    taxonid = models.TextField(db_column='TaxonID', blank=True, null=True)
+    rank = models.TextField(db_column='Rank', blank=True, null=True)
+    species = models.TextField(blank=True, null=True)
+    genus = models.TextField(blank=True, null=True)
+    family = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'especies'
+
+

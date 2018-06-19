@@ -14,14 +14,22 @@ class EstacoesAdmin(admin.ModelAdmin):
 
 class BiodiversidadeAdmin(admin.ModelAdmin):
     search_fields = ('species',)
-    list_display = ('id', 'species', 'algorithm', 'database', 'qseqid', 'sseqid',
-                    'pident', 'length', 'mismatch', 'gapopen', 'qstart',
-                    'qend', 'sstart', 'send', 'evalue', 'bitscore', 'gi',
-                    'geneid', 'ncbitaxon', 'ltaxon', 'repid', 'clustername', 'obs')
+    list_display = ('id', 'species', 'algorithm', 'database', 'qseqid',
+                    'sseqid', 'pident', 'length', 'mismatch', 'gapopen',
+                    'qstart', 'qend', 'sstart', 'send', 'evalue',
+                    'bitscore', 'gi', 'geneid', 'ncbitaxon', 'ltaxon',
+                    'repid', 'clustername', 'obs', 'station', 'lat',
+                    'long', 'original_seq_code', 'source', 'lat2',
+                    'long2', 'frequency', 'string1', 'string2', 'string3',
+                    'string4')
 
     def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super(BiodiversidadeAdmin, self).get_search_results(
-            request, queryset, search_term)
+        queryset, use_distinct = super(
+            BiodiversidadeAdmin,
+            self).get_search_results(
+                request,
+                queryset,
+                search_term)
 
         queryset = Biodiversidade.objects.filter()
 
