@@ -1,9 +1,12 @@
 # coding=utf8
 from django.contrib import admin
-from listagens.models import Biodiversidade, Estacoes
+from listagens.models import (
+    Biodiversidade,
+    Estacoes,
+    Especies
+)
 from django.core.exceptions import ValidationError
 
-# Register your models here.
 
 class EstacoesAdmin(admin.ModelAdmin):
     list_display = (
@@ -11,6 +14,19 @@ class EstacoesAdmin(admin.ModelAdmin):
     )
 
     search_fields = ('id', )
+
+
+class EspeciesAdmin(admin.ModelAdmin):
+    list_display = (
+        'id','row_names', 'cod', 'item_taxonomico', 'código_item_taxonomico',
+        'item_taxonomico_superior', 'codigo_item_taxononico_superior',
+        'nome_atribuido', 'filo', 'classe', 'ordem', 'familia', 'genero',
+        'especie', 'fonte', 'amostras', 'taxonid', 'rank', 'species',
+        'genus', 'family',
+    )
+
+    search_fields = ('id', 'classe', 'ordem', 'genero', 'especie')
+
 
 class BiodiversidadeAdmin(admin.ModelAdmin):
     search_fields = ('species',)
@@ -100,3 +116,4 @@ admin.site.index_title = u'Biodiversidade'
 
 admin.site.register(Biodiversidade, BiodiversidadeAdmin)
 admin.site.register(Estacoes, EstacoesAdmin)
+admin.site.register(Especies, EspeciesAdmin)
