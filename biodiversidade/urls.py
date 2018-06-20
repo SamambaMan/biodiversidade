@@ -15,17 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from listagens.views import importacao
 from django.conf import settings
-from django.conf.urls.static import static
-from django.views.generic import RedirectView
+from listagens.views import importacao
+from dashboard.views import index
 
 
 urlpatterns = [
-    url(r'^', admin.site.urls),
+    url(r'^admin/', admin.site.urls),
     url(r'^importacao/', importacao),
-    #url(r'^$', RedirectView.as_view(url='/biodiversidade/admin/')),
+    url(r'^', index ),
 ]
-
-    
-

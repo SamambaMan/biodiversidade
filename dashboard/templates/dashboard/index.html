@@ -1,0 +1,4 @@
+<h1>Número de extratos por categoria química</h1>
+{% for resultado in resultados %}
+    {{resultado.classname}} - {{resultado.count}}<br>
+{% endfor %}
