@@ -23,5 +23,5 @@ from dashboard.views import index
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^importacao/', importacao),
-    url(r'^', index ),
+    url(r'^$', index ),
 ]
