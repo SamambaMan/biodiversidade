@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.db import connection
+from collections import defaultdict, OrderedDict
+import pandas as pd
 
 _QUERY_STATUS_POR_CATEGORIA = """
 select chm.classname, count(*)
@@ -86,9 +88,20 @@ def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
     columns = [col[0] for col in cursor.description]
     return [
-        dict(zip(columns, row))
+        OrderedDict(zip(columns, row))
         for row in cursor.fetchall()
     ]
+
+
+def serializa(listagem):
+    saida = []
+    for item in listagem:
+        linha = []
+        for chave in item:
+            linha.append(item[chave])
+        saida.append(linha)
+    return saida
+
 
 def index(request):
     with connection.cursor() as cursor:
@@ -110,7 +123,8 @@ def index(request):
         cursor.execute(_QUERY_NUMERO_FRACOES_POR_ORGAO % _ELUENTE_FINAL)
         extrato_por_orgao_final = dictfetchall(cursor)
 
-        _QUERY_NUMERO_FRACOES_POR_ORGAO 
+
+    import ipdb; ipdb.set_trace()
 
     return render(
         request,

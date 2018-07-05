@@ -1,61 +1,60 @@
-<style>
-    .caixa {
-        height: 300px;
-        overflow: scroll;
-    }
-</style>
+<html>
 
-<h1>Número de extratos por Categoria Química</h1>
-<div class="caixa">
-{% for resultado in status_por_classe_quimica %}
-    {{resultado.classname}} - {{resultado.count}}<br>
-{% endfor %}
-</div>
-<hr>
-<h1>Número de extratos por Espécie</h1>
-<div class="caixa">
-{% for resultado in status_por_especie %}
-    {{resultado.family}} - {{resultado.genus}} - {{resultado.species}} - {{resultado.count}}<br>
-{% endfor %}
-</div>
-<hr>
-<div style="width: 600px;display: inline-table;">
-<h1>Frações por Extrato por Planta - Inicial</h1>
-<div class="caixa">
-{% for resultado in extrato_por_fracao_por_planta_inicial %}
-    {{resultado.family}} - {{resultado.genus}} - {{resultado.species}} - {{resultado.count}}<br>
-{% endfor %}
-</div>
-</div>
-<div  style="width: 600px;display: inline-table;">
-<h1>Frações por Extrato por Planta - Final</h1>
-<div class="caixa">
-{% for resultado in extrato_por_fracao_por_planta_final %}
-    {{resultado.family}} - {{resultado.genus}} - {{resultado.species}} - {{resultado.count}}<br>
-{% endfor %}
-</div>
-</div>
-<hr>
-<div style="width: 600px;display: inline-table;">
-<h1>Extratos por Parte de Planta - Inicial</h1>
-<div class="caixa">
-{% for resultado in extrato_por_orgao_inicial %}
-    {{resultado.organ}} - {{resultado.count}}<br>
-{% endfor %}
-</div>
-</div>
-<div  style="width: 600px;display: inline-table;">
-<h1>Extratos por Parte de Planta - Final</h1>
-<div class="caixa">
-{% for resultado in extrato_por_orgao_final %}
-    {{resultado.organ}} - {{resultado.count}}<br>
-{% endfor %}
-</div>
-</div>
+<head>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+</head>
 
+<body>
+    <style>
+        .caixa {
+            height: 300px;
+            overflow: scroll;
+        }
+    </style>
 
+    <h1>Número de extratos por Categoria Química</h1>
+    <div class="caixa">
+        {% for resultado in status_por_classe_quimica %} {{resultado.classname}} - {{resultado.count}}
+        <br> {% endfor %}
+    </div>
+    <hr>
+    <h1>Número de extratos por Espécie</h1>
+    <div class="caixa">
+        {% for resultado in status_por_especie %} {{resultado.family}} - {{resultado.genus}} - {{resultado.species}} - {{resultado.count}}
+        <br> {% endfor %}
+    </div>
+    <hr>
+    <div style="width: 600px;display: inline-table;">
+        <h1>Frações por Extrato por Planta - Inicial</h1>
+        <div class="caixa">
+            {% for resultado in extrato_por_fracao_por_planta_inicial %} {{resultado.family}} - {{resultado.genus}} - {{resultado.species}}
+            - {{resultado.count}}
+            <br> {% endfor %}
+        </div>
+    </div>
+    <div style="width: 600px;display: inline-table;">
+        <h1>Frações por Extrato por Planta - Final</h1>
+        <div class="caixa">
+            {% for resultado in extrato_por_fracao_por_planta_final %} {{resultado.family}} - {{resultado.genus}} - {{resultado.species}}
+            - {{resultado.count}}
+            <br> {% endfor %}
+        </div>
+    </div>
+    <hr>
+    <div style="width: 600px;display: inline-table;">
+        <h1>Extratos por Parte de Planta - Inicial</h1>
+        <div class="caixa">
+            {% for resultado in extrato_por_orgao_inicial %} {{resultado.organ}} - {{resultado.count}}
+            <br> {% endfor %}
+        </div>
+    </div>
+    <div style="width: 600px;display: inline-table;">
+        <h1>Extratos por Parte de Planta - Final</h1>
+        <div class="caixa">
+            {% for resultado in extrato_por_orgao_final %} {{resultado.organ}} - {{resultado.count}}
+            <br> {% endfor %}
+        </div>
+    </div>
+</body>
 
-
-
-
-
+</html>
