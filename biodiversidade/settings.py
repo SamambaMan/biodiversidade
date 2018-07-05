@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -88,9 +89,16 @@ DATABASES = {
       'PORT': os.environ['DB_PORT'],
       'NAME': os.environ['DB_NAME'],
       'USER': os.environ['DB_USER'],
-      'PASSWORD': os.environ['DB_PASSWORD']
+      'PASSWORD': os.environ['DB_PASSWORD'],
     }
 }
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3'
+        }
+    }
 
 
 
