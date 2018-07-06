@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.db import connection
 from collections import defaultdict, OrderedDict
-import pandas as pd
+import csv
+import random
 
 _QUERY_STATUS_POR_CATEGORIA = """
 select chm.classname, count(*)
@@ -103,7 +104,7 @@ def serializa(listagem):
     return saida
 
 
-def index(request):
+def listagens():
     with connection.cursor() as cursor:
         cursor.execute(_QUERY_STATUS_POR_CATEGORIA)
         status_por_classe_quimica = dictfetchall(cursor)
@@ -122,14 +123,7 @@ def index(request):
 
         cursor.execute(_QUERY_NUMERO_FRACOES_POR_ORGAO % _ELUENTE_FINAL)
         extrato_por_orgao_final = dictfetchall(cursor)
-
-
-    import ipdb; ipdb.set_trace()
-
-    return render(
-        request,
-        'dashboard/index.html',
-        {
+        return {
             'status_por_classe_quimica': status_por_classe_quimica,
             'status_por_especie': status_por_especie,
             'extrato_por_fracao_por_planta_inicial': extrato_por_fracao_por_planta_inicial,
@@ -137,4 +131,66 @@ def index(request):
             'extrato_por_orgao_inicial': extrato_por_orgao_inicial,
             'extrato_por_orgao_final': extrato_por_orgao_final
         }
+
+def b(entrada):
+    if not entrada:
+        return "branco"
+    return entrada.replace('-',' ')
+
+def index(request):
+    
+    saida = []
+    with open('saida.csv', 'r') as arquivo:
+        arquivo.readline()
+        reader = csv.reader(arquivo)
+        for row in reader:
+            saida.append([
+                b(row[1]),
+                b(row[2]),
+                b(row[3]),
+                row[4],
+            ])
+
+    cores = []
+
+    for familia in saida:
+        cores.append(
+            [familia[0], 'rgb' + str(random_color())]
+        )
+        cores.append(
+            [familia[1], 'rgb' + str(random_color())]
+        )
+        cores.append(
+            [familia[2], 'rgb' + str(random_color())]
+        )
+        
+    return render(
+        request,
+        'dashboard/index.html',
+        {'resultados': saida,
+        'cores': cores}
     )
+
+
+def pivoteia(dicionario, chaves, item):
+    if not dicionario:
+        dicionario = {}
+    
+    if len(chaves) == 2:
+        "cheguei na folha"
+        folha = {'name': item[chaves[0]], 'size': chaves[1]}
+        
+
+def transforma(listadedicionario):
+    retorno = []
+    for item in listadedicionario:
+        pivotado = pivoteia(None, item.keys(), item, listatotal)
+        retorno.append(pivotado)
+
+
+def random_color():
+    rgbl=[int(random.random() * 255),
+        int(random.random() * 255),
+        int(random.random() * 255)
+    ]
+    return tuple(rgbl)
