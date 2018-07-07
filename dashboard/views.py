@@ -139,58 +139,19 @@ def b(entrada):
 
 def index(request):
     
+    retorno = listagens()['extrato_por_fracao_por_planta_final']
+
     saida = []
-    with open('saida.csv', 'r') as arquivo:
-        arquivo.readline()
-        reader = csv.reader(arquivo)
-        for row in reader:
-            saida.append([
-                b(row[1]),
-                b(row[2]),
-                b(row[3]),
-                row[4],
-            ])
+    for row in retorno:
+        saida.append([
+            b(row['family']),
+            b(row['genus']),
+            b(row['species']),
+            row['count'],
+        ])
 
-    cores = []
-
-    for familia in saida:
-        cores.append(
-            [familia[0], 'rgb' + str(random_color())]
-        )
-        cores.append(
-            [familia[1], 'rgb' + str(random_color())]
-        )
-        cores.append(
-            [familia[2], 'rgb' + str(random_color())]
-        )
-        
     return render(
         request,
         'dashboard/index.html',
-        {'resultados': saida,
-        'cores': cores}
+        {'resultados': saida}
     )
-
-
-def pivoteia(dicionario, chaves, item):
-    if not dicionario:
-        dicionario = {}
-    
-    if len(chaves) == 2:
-        "cheguei na folha"
-        folha = {'name': item[chaves[0]], 'size': chaves[1]}
-        
-
-def transforma(listadedicionario):
-    retorno = []
-    for item in listadedicionario:
-        pivotado = pivoteia(None, item.keys(), item, listatotal)
-        retorno.append(pivotado)
-
-
-def random_color():
-    rgbl=[int(random.random() * 255),
-        int(random.random() * 255),
-        int(random.random() * 255)
-    ]
-    return tuple(rgbl)
