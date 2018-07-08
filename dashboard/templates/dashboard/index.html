@@ -125,14 +125,14 @@
       chart(std_status_por_especie, 'status_por_especie')
 
       // Extrato por Fração por Planta - Inicial
-      const extrato_por_fracao_por_planta_inicial = `{% for resultado in extrato_por_fracao_por_planta_inicial %}{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
+      const extrato_por_fracao_por_planta_inicial = `{% for resultado in extrato_por_fracao_por_planta_inicial %}{{resultado.classname}}-{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
 {% endfor %}`
       const csv_extrato_por_fracao_por_planta_inicial = d3.csvParseRows(extrato_por_fracao_por_planta_inicial)
       const std_extrato_por_fracao_por_planta_inicial = buildHierarchy(csv_extrato_por_fracao_por_planta_inicial, "Total")
       chart(std_extrato_por_fracao_por_planta_inicial, 'extrato_por_fracao_por_planta_inicial')
 
       // Extrato por Fração por Planta - Final
-      const extrato_por_fracao_por_planta_final = `{% for resultado in extrato_por_fracao_por_planta_final %}{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
+      const extrato_por_fracao_por_planta_final = `{% for resultado in extrato_por_fracao_por_planta_final %}{{resultado.classname}}-{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
 {% endfor %}`    
       const csv_extrato_por_fracao_por_planta_final = d3.csvParseRows(extrato_por_fracao_por_planta_final)
       const std_extrato_por_fracao_por_planta_final = buildHierarchy(csv_extrato_por_fracao_por_planta_final, "Total")

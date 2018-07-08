@@ -31,7 +31,7 @@ order by count(*) desc
 """
 
 _QUERY_FRACOES_POR_EXTRATO_POR_PLANTA = """
-select tpl.family, tpl.genus, tpl.species, count(1)
+select chc.classname, tpl.family, tpl.genus, tpl.species, count(1)
 from sample smp_fr
 inner join fraction frc on
    frc.sampleid = smp_fr.sampleid
@@ -51,7 +51,7 @@ inner join chemical_classes chc on
    chc.chemclassid = tlc.chemclassid
 where smp_fr.type = 'fraction'
 %s
-group by tpl.family, tpl.genus, tpl.species
+group by chc.classname, tpl.family, tpl.genus, tpl.species
 order by count(1) desc	
 """
 
