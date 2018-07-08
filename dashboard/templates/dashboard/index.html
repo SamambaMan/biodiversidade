@@ -1,11 +1,32 @@
+{% load utils %}
 <!DOCTYPE html>
 <html>
 
 <head>
   <meta charset="utf-8">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.min.js"></script>
   <script src="//unpkg.com/sunburst-chart"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://rawgit.com/dmesquita/reusable_bubble_chart/master/bubble_chart.js"></script>
+  
+  <style>
+    #corpo {
+      text-align: center;
+    }
+  </style>
   <script>
+
+    const color = d3.scaleOrdinal(d3.schemeCategory20);
+
+    function chart(data, divid){
+      const myChart = Sunburst()
+      myChart.data(data)
+        .label('name')
+        .color((d, parent) => color(parent ? parent.data.name : null))
+        .tooltipContent((d, node) => `Size: <i>${node.value}</i>`)
+        .width(1200)
+        .height(1200)
+        .size('size')(document.getElementById(divid))
+    }
     // Take a 2-column CSV and transform it into a hierarchical structure suitable
     // for a partition layout. The first column is a sequence of step names, from
     // root to leaf, separated by hyphens. The second column is a count of how 
@@ -51,25 +72,111 @@
     };
   </script>
   <body>
-    <div id="saida"></div>
+    <div id="corpo">
+      <h1>Amostras por Classes Químicas</h1>
+      <div class="chart-example" id="classes_quimicas"><svg></svg></div>
+      <br><br>
+      <h1>Extratos por Espécie de Planta</h1>
+      <div id="status_por_especie"></div>
+      <br><br>
+      <h1>Extratos por Fração e Espécie de Planta - Iniciais</h1>
+      <div id="extrato_por_fracao_por_planta_inicial"></div>
+      <br><br>
+      <h1>Extratos por Fração e Espécie de Planta - Finais</h1>
+      <div id="extrato_por_fracao_por_planta_final"></div>
+      <br><br>
+      <div style="width: 550px;display: inline-table;">
+        <h1>Extratos por Parte de Planta - Iniciais</h1>
+        <div id="chart_extratos_parte_planta_inicial"><svg></svg></div>
+      </div>
+      <div style="width: 550px;display: inline-table;">
+        <h1>Extratos por Parte de Planta - Finais</h1>
+        <div id="chart_extratos_parte_planta_final"><svg></svg></div>
+      </div>
+    </div>
 
+      
     <script>
-      const text = `{% for resultado in resultados %}{{resultado.0}}-{{resultado.1}}-{{resultado.2}},{{resultado.3}}
+
+      var chart_classes = bubbleChart(); 
+      chart_classes.width(400)
+        .height(300)
+        .minRadius(30)
+        .maxRadius(55)
+        .forceApart(-170)
+        .showTitleOnCircle(true)
+        .title("")
+
+      d3.select("#classes_quimicas")
+        .datum(
+          [
+            {% for classe in status_por_classe_quimica %}
+              {'title': '{%b classe.classname %}',
+              'category': '{%b classe.classname %}',
+              'views': {{classe.count}}},
+            {% endfor %}
+            ]       ).call(chart_classes)
+
+      // Extratos por Expécie 
+      const status_por_especie = `{% for resultado in status_por_especie %}{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
 {% endfor %}`
+      const csv_status_por_especie = d3.csvParseRows(status_por_especie)
+      const std_status_por_especie = buildHierarchy(csv_status_por_especie, "Total")
+      chart(std_status_por_especie, 'status_por_especie')
 
-      const color = d3.scaleOrdinal(d3.schemeCategory20);
+      // Extrato por Fração por Planta - Inicial
+      const extrato_por_fracao_por_planta_inicial = `{% for resultado in extrato_por_fracao_por_planta_inicial %}{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
+{% endfor %}`
+      const csv_extrato_por_fracao_por_planta_inicial = d3.csvParseRows(extrato_por_fracao_por_planta_inicial)
+      const std_extrato_por_fracao_por_planta_inicial = buildHierarchy(csv_extrato_por_fracao_por_planta_inicial, "Total")
+      chart(std_extrato_por_fracao_por_planta_inicial, 'extrato_por_fracao_por_planta_inicial')
+
+      // Extrato por Fração por Planta - Final
+      const extrato_por_fracao_por_planta_final = `{% for resultado in extrato_por_fracao_por_planta_final %}{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
+{% endfor %}`    
+      const csv_extrato_por_fracao_por_planta_final = d3.csvParseRows(extrato_por_fracao_por_planta_final)
+      const std_extrato_por_fracao_por_planta_final = buildHierarchy(csv_extrato_por_fracao_por_planta_final, "Total")
+      chart(std_extrato_por_fracao_por_planta_final, 'extrato_por_fracao_por_planta_final')
+      
+
+      var chart_extratos_parte_planta_inicial = bubbleChart(); 
+      chart_extratos_parte_planta_inicial.width(400)
+        .height(300)
+        .minRadius(30)
+        .maxRadius(55)
+        .forceApart(-170)
+        .showTitleOnCircle(true)
+        .title("")
+
+      d3.select("#chart_extratos_parte_planta_inicial")
+        .datum(
+          [
+            {% for classe in extrato_por_orgao_inicial %}
+              {'title': '{%b classe.organ %}',
+              'category': '{%b classe.organ %}',
+              'views': {{classe.count}}},
+            {% endfor %}
+            ]       ).call(chart_extratos_parte_planta_inicial)
 
 
-      const csv = d3.csvParseRows(text)
-      const structured = buildHierarchy(csv, "Famílias")
+      var chart_extratos_parte_planta_final = bubbleChart(); 
+      chart_extratos_parte_planta_final.width(400)
+        .height(300)
+        .minRadius(30)
+        .maxRadius(55)
+        .forceApart(-170)
+        .showTitleOnCircle(true)
+        .title("")
 
-
-      const myChart = Sunburst()
-      myChart.data(structured)
-        .label('name')
-        .color((d, parent) => color(parent ? parent.data.name : null))
-        .tooltipContent((d, node) => `Size: <i>${node.value}</i>`)
-        .size('size')(document.getElementById("saida"))
+      d3.select("#chart_extratos_parte_planta_final")
+        .datum(
+          [
+            {% for classe in extrato_por_orgao_final %}
+              {'title': '{%b classe.organ %}',
+              'category': '{%b classe.organ %}',
+              'views': {{classe.count}}},
+            {% endfor %}
+            ]       ).call(chart_extratos_parte_planta_final)
 
     </script>
   </body>

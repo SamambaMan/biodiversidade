@@ -132,26 +132,13 @@ def listagens():
             'extrato_por_orgao_final': extrato_por_orgao_final
         }
 
-def b(entrada):
-    if not entrada:
-        return "branco"
-    return entrada.replace('-',' ')
 
 def index(request):
     
-    retorno = listagens()['extrato_por_fracao_por_planta_final']
-
-    saida = []
-    for row in retorno:
-        saida.append([
-            b(row['family']),
-            b(row['genus']),
-            b(row['species']),
-            row['count'],
-        ])
+    retorno = listagens()
 
     return render(
         request,
         'dashboard/index.html',
-        {'resultados': saida}
+        retorno
     )
