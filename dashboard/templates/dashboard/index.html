@@ -1,4 +1,5 @@
 {% load utils %}
+{% load l10n %}
 <!DOCTYPE html>
 <html>
 
@@ -7,11 +8,22 @@
   <script src="//unpkg.com/sunburst-chart"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://rawgit.com/dmesquita/reusable_bubble_chart/master/bubble_chart.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.2/dist/leaflet.css"
+    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+    crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.3.2/dist/leaflet.js"
+    integrity="sha512-2fA79E27MOeBgLjmBrtAgM/20clVSV8vJERaW/EcnnWCVGwQRazzKtQS1kIusCZv1PtaQxosDZZ0F1Oastl55w=="
+    crossorigin=""></script>
+  <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.3.0/leaflet.markercluster.js'></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.3.0/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.3.0/MarkerCluster.css" />
+
   
   <style>
     #corpo {
       text-align: center;
     }
+    #mapid { height: 800px; }
   </style>
   <script>
 
@@ -76,23 +88,14 @@
       <h1>Amostras por Classes Químicas</h1>
       <div class="chart-example" id="classes_quimicas"><svg></svg></div>
       <br><br>
-      <h1>Extratos por Espécie de Planta</h1>
-      <div id="status_por_especie"></div>
-      <br><br>
       <h1>Extratos por Fração e Espécie de Planta - Iniciais</h1>
       <div id="extrato_por_fracao_por_planta_inicial"></div>
       <br><br>
       <h1>Extratos por Fração e Espécie de Planta - Finais</h1>
       <div id="extrato_por_fracao_por_planta_final"></div>
       <br><br>
-      <div style="width: 550px;display: inline-table;">
-        <h1>Extratos por Parte de Planta - Iniciais</h1>
-        <div id="chart_extratos_parte_planta_inicial"><svg></svg></div>
-      </div>
-      <div style="width: 550px;display: inline-table;">
-        <h1>Extratos por Parte de Planta - Finais</h1>
-        <div id="chart_extratos_parte_planta_final"><svg></svg></div>
-      </div>
+      <h1>Localizacao de Plantas</h1>
+      <div id="mapid"></div>
     </div>
 
       
@@ -117,66 +120,55 @@
             {% endfor %}
             ]       ).call(chart_classes)
 
-      // Extratos por Expécie 
-      const status_por_especie = `{% for resultado in status_por_especie %}{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
-{% endfor %}`
-      const csv_status_por_especie = d3.csvParseRows(status_por_especie)
-      const std_status_por_especie = buildHierarchy(csv_status_por_especie, "Total")
-      chart(std_status_por_especie, 'status_por_especie')
-
       // Extrato por Fração por Planta - Inicial
-      const extrato_por_fracao_por_planta_inicial = `{% for resultado in extrato_por_fracao_por_planta_inicial %}{{resultado.classname}}-{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
+      const extrato_por_fracao_por_planta_inicial = `{% for resultado in extrato_por_fracao_por_planta_inicial %}{{resultado.classname}}-{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%}-{%b resultado.organ%},{{resultado.count}}
 {% endfor %}`
       const csv_extrato_por_fracao_por_planta_inicial = d3.csvParseRows(extrato_por_fracao_por_planta_inicial)
       const std_extrato_por_fracao_por_planta_inicial = buildHierarchy(csv_extrato_por_fracao_por_planta_inicial, "Total")
       chart(std_extrato_por_fracao_por_planta_inicial, 'extrato_por_fracao_por_planta_inicial')
 
       // Extrato por Fração por Planta - Final
-      const extrato_por_fracao_por_planta_final = `{% for resultado in extrato_por_fracao_por_planta_final %}{{resultado.classname}}-{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%},{{resultado.count}}
+      const extrato_por_fracao_por_planta_final = `{% for resultado in extrato_por_fracao_por_planta_final %}{{resultado.classname}}-{%b resultado.family %}-{%b resultado.genus%}-{%b resultado.species%}-{%b resultado.organ%},{{resultado.count}}
 {% endfor %}`    
       const csv_extrato_por_fracao_por_planta_final = d3.csvParseRows(extrato_por_fracao_por_planta_final)
       const std_extrato_por_fracao_por_planta_final = buildHierarchy(csv_extrato_por_fracao_por_planta_final, "Total")
       chart(std_extrato_por_fracao_por_planta_final, 'extrato_por_fracao_por_planta_final')
       
 
-      var chart_extratos_parte_planta_inicial = bubbleChart(); 
-      chart_extratos_parte_planta_inicial.width(400)
-        .height(300)
-        .minRadius(30)
-        .maxRadius(55)
-        .forceApart(-170)
-        .showTitleOnCircle(true)
-        .title("")
+      // Carregando o mapa do leaflet
+      let mymap = L.map('mapid').setView([-13.0181925, -48.2796598], 5)
 
-      d3.select("#chart_extratos_parte_planta_inicial")
-        .datum(
-          [
-            {% for classe in extrato_por_orgao_inicial %}
-              {'title': '{%b classe.organ %}',
-              'category': '{%b classe.organ %}',
-              'views': {{classe.count}}},
-            {% endfor %}
-            ]       ).call(chart_extratos_parte_planta_inicial)
+      L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+          attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+          maxZoom: 18,
+          id: 'mapbox.streets',
+          accessToken: 'pk.eyJ1Ijoic2FtYW1iYW1hbiIsImEiOiJjaXQ0c3lsaXUwMDBjMnFxMGlneDRmaGZsIn0.Vs2UAhQ02MMa8snEdWRxRQ'
+      }).addTo(mymap)
+      
+      let markers = [
+        {% for linha in localizacao_plantas %}
+          {
+            lat:{{linha.lat|unlocalize}},
+            long:{{linha.lon|unlocalize}},
+            species:`{{linha.family}} {{linha.genus}} {{linha.species}}`
+          },
+        {% endfor %}
+      ]
 
+      let cluster = L.markerClusterGroup()
 
-      var chart_extratos_parte_planta_final = bubbleChart(); 
-      chart_extratos_parte_planta_final.width(400)
-        .height(300)
-        .minRadius(30)
-        .maxRadius(55)
-        .forceApart(-170)
-        .showTitleOnCircle(true)
-        .title("")
+      markers.map((marker) => {
+        newMarker = L.marker([
+          marker.lat,
+          marker.long
+        ]).bindPopup(marker.species)
 
-      d3.select("#chart_extratos_parte_planta_final")
-        .datum(
-          [
-            {% for classe in extrato_por_orgao_final %}
-              {'title': '{%b classe.organ %}',
-              'category': '{%b classe.organ %}',
-              'views': {{classe.count}}},
-            {% endfor %}
-            ]       ).call(chart_extratos_parte_planta_final)
+        cluster.addLayer(newMarker)
+
+        }
+      )
+
+      mymap.addLayer(cluster)
 
     </script>
   </body>

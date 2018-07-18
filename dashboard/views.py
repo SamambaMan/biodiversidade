@@ -31,7 +31,7 @@ order by count(*) desc
 """
 
 _QUERY_FRACOES_POR_EXTRATO_POR_PLANTA = """
-select chc.classname, tpl.family, tpl.genus, tpl.species, count(1)
+select chc.classname, tpl.family, tpl.genus, tpl.species, tpo.organ, count(1)
 from sample smp_fr
 inner join fraction frc on
    frc.sampleid = smp_fr.sampleid
@@ -51,7 +51,7 @@ inner join chemical_classes chc on
    chc.chemclassid = tlc.chemclassid
 where smp_fr.type = 'fraction'
 %s
-group by chc.classname, tpl.family, tpl.genus, tpl.species
+group by chc.classname, tpl.family, tpl.genus, tpl.species, tpo.organ
 order by count(1) desc	
 """
 
@@ -84,6 +84,17 @@ order by count(1) desc
 _ELUENTE_INICIAL = "and tlp.eluent_developer <=3 "
 _ELUENTE_FINAL = "and tlp.eluent_developer > 3 "
 
+_CONSULTA_LOCALIZACAO_PLANTAS = """
+select 
+    family, 
+    genus, 
+    species, 
+    lat,
+    lon
+from tplant
+where lat is not null and lon is not null
+"""
+
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -109,27 +120,20 @@ def listagens():
         cursor.execute(_QUERY_STATUS_POR_CATEGORIA)
         status_por_classe_quimica = dictfetchall(cursor)
 
-        cursor.execute(_QUERY_STATUS_POR_ESPECIE)
-        status_por_especie = dictfetchall(cursor)
-
         cursor.execute(_QUERY_FRACOES_POR_EXTRATO_POR_PLANTA % _ELUENTE_INICIAL)
         extrato_por_fracao_por_planta_inicial = dictfetchall(cursor)
 
         cursor.execute(_QUERY_FRACOES_POR_EXTRATO_POR_PLANTA % _ELUENTE_FINAL)
         extrato_por_fracao_por_planta_final = dictfetchall(cursor)
 
-        cursor.execute(_QUERY_NUMERO_FRACOES_POR_ORGAO % _ELUENTE_INICIAL)
-        extrato_por_orgao_inicial = dictfetchall(cursor)
+        cursor.execute(_CONSULTA_LOCALIZACAO_PLANTAS)
+        localizacao_plantas = dictfetchall(cursor)
 
-        cursor.execute(_QUERY_NUMERO_FRACOES_POR_ORGAO % _ELUENTE_FINAL)
-        extrato_por_orgao_final = dictfetchall(cursor)
         return {
             'status_por_classe_quimica': status_por_classe_quimica,
-            'status_por_especie': status_por_especie,
             'extrato_por_fracao_por_planta_inicial': extrato_por_fracao_por_planta_inicial,
             'extrato_por_fracao_por_planta_final': extrato_por_fracao_por_planta_final,
-            'extrato_por_orgao_inicial': extrato_por_orgao_inicial,
-            'extrato_por_orgao_final': extrato_por_orgao_final
+            'localizacao_plantas': localizacao_plantas
         }
 
 
