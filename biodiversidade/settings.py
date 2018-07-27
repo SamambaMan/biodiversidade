@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'listagens',
     'extractadata',
-    'dashboard'
+    'dashboard',
+    'biobureau',
+    'django_extensions',
 ]
 
 STATICFILES_FINDERS = [
@@ -93,10 +95,11 @@ DATABASES = {
     }
 }
 
-if 'test' in sys.argv:
-    DATABASES = {
+# if 'test' in sys.argv:
+DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3'
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'banco.sqlite3'
         }
     }
 

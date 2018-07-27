@@ -77,3 +77,32 @@ class ParteDePlanta(models.Model):
     cheiro = models.CharField(max_length=50)
     peso = models.FloatField()
     notas = models.TextField()
+
+
+class Sequenciamento(models.Model):
+    data = models.DateField(verbose_name="Data do Sequenciamento Genético")
+    amostra = models.ForeignKey('Amostra')
+    arquivo_fasta = models.CharField(max_length=1000)
+
+
+class Eluente(models.Model):
+    nome = models.CharField(max_length=100)
+    polar = models.BooleanField()
+
+
+class Extrato(models.Model):
+    data = models.DateField()
+    parte_de_planta = models.ForeignKey('ParteDePlanta')
+
+
+class Ensaio(models.Model):
+    extrato = models.ForeignKey('Extrato')
+    classe_quimica = models.ForeignKey('ClasseQuimica')
+    eluente = models.ForeignKey('Eluente')
+
+
+class ClasseQuimica(models.Model):
+    nome = models.CharField(max_length=50)
+
+
+
