@@ -79,30 +79,37 @@ class ParteDePlanta(models.Model):
     notas = models.TextField()
 
 
-class Sequenciamento(models.Model):
-    data = models.DateField(verbose_name="Data do Sequenciamento Genético")
-    amostra = models.ForeignKey('Amostra')
-    arquivo_fasta = models.CharField(max_length=1000)
-
-
 class Eluente(models.Model):
     nome = models.CharField(max_length=100)
     polar = models.BooleanField()
-
-
-class Extrato(models.Model):
-    data = models.DateField()
-    parte_de_planta = models.ForeignKey('ParteDePlanta')
-
-
-class Ensaio(models.Model):
-    extrato = models.ForeignKey('Extrato')
-    classe_quimica = models.ForeignKey('ClasseQuimica')
-    eluente = models.ForeignKey('Eluente')
 
 
 class ClasseQuimica(models.Model):
     nome = models.CharField(max_length=50)
 
 
+class TipoDeExtrato(models.Model):
+    nome = models.CharField(max_length=50)
 
+
+class Extrato(models.Model):
+    data = models.DateField()
+    tipo = models.ForeignKey('TipoDeExtrato')
+    parte_de_planta = models.ForeignKey('ParteDePlanta')
+
+
+class Sequenciamento(models.Model):
+    data = models.DateField(verbose_name="Data do Sequenciamento Genético")
+    extrato = models.ForeignKey('Extrato')
+    arquivo_fasta = models.CharField(max_length=1000)
+
+
+class Fracao(models.Model):
+    extrato = models.ForeignKey('Extrato')
+    eluente = models.ForeignKey('Eluente')
+
+
+class Fracionamento(models.Model):
+    fracao = models.ForeignKey('Fracao')
+    classe_quimica = models.ForeignKey('ClasseQuimica')
+    positivo = models.BooleanField()
