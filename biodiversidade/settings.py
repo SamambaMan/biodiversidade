@@ -96,12 +96,12 @@ DATABASES = {
 }
 
 # if 'test' in sys.argv:
-DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'banco.sqlite3'
-        }
-    }
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': 'banco.sqlite3'
+#         }
+#     }
 
 GRAPH_MODELS = {
   'all_applications': False,
