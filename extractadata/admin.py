@@ -29,11 +29,6 @@ class VPlatePlantAdmin(ModelAdminView):
 
 
 class VCompoundAdmin(ModelAdminView):
-    def get_actions(self, request):
-        actions = super(VCompoundAdmin, self).get_actions(request)
-        del actions['delete_selected']
-        return
-
     list_display = (
         'sampleid',
         'origin_sampleid',
