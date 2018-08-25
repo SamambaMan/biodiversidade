@@ -1,4 +1,5 @@
 from collections import defaultdict, OrderedDict
+from memoized import memoized
 from django.core.management import BaseCommand
 from django.db import connection
 from django.utils.timezone import localtime
@@ -8,7 +9,11 @@ from biobureau.models import (
     Especie,
     Especime,
     OrgaoDePlanta,
-    Amostra
+    Amostra,
+    Aliquota,
+    Fracionamento,
+    TipoDeFracionamento,
+    TipoDeAliquota
 )
 from datetime import datetime
 
@@ -21,6 +26,10 @@ def dictfetchall(cursor):
     ]
 
 def limpabanco():
+    Fracionamento.objects.all().delete()
+    Aliquota.objects.all().delete()
+    Fracionamento.objects.all().delete()
+    Aliquota.objects.all().delete()
     Amostra.objects.all().delete()
     OrgaoDePlanta.objects.all().delete()
     Especime.objects.all().delete()
@@ -34,6 +43,8 @@ _GENEROS = "select distinct(genus) from tplant where family #"
 _ESPECIES = "select distinct(species) from tplant where genus # and family $"
 _PLANTAS = "select * from tplant where species # and genus $ and family @"
 _ORGAOS = "select * from tplantorgan where tplantid = #"
+_FRACIONAMENTOS = "select * from fractionation where pfssampleid = #"
+_SAMPLE = "select * from sample where sampleid = #"
 
 
 def compara_sql(entrada):
@@ -86,6 +97,7 @@ def importar_plantas(familia, genero, especie, n_especie, cursor):
         importar_orgaos_planta(n_especime, planta['tplantid'], cursor)
 
 
+@memoized
 def obter_tipo_orgao(nome):
     orgao = OrgaoDePlanta.objects.filter(orgao=nome).first()
     if orgao:
@@ -116,6 +128,58 @@ def importar_orgaos_planta(planta, idplanta, cursor):
         n_amostra.notas = orgao['notes']
 
         n_amostra.save()
+        
+        importar_fracionamentos(n_amostra, orgao['sampleid'], cursor)
+
+@memoized
+def obter_tipo_fracionamento(nome):
+    fracionamento = TipoDeFracionamento.objects.filter(nome=nome).first()
+    if fracionamento:
+        return fracionamento
+    fracionamento = TipoDeFracionamento()
+    fracionamento.nome = nome
+    fracionamento.save()
+    return fracionamento
+
+@memoized
+def obter_tipo_de_aliquota():
+    tipo = TipoDeAliquota.objects.all().first()
+    if tipo:
+        return tipo
+    tipo = TipoDeAliquota()
+    tipo.nome = "Fracionamento"
+    tipo.save()
+    return tipo
+
+def importar_fracionamentos(orgao, sampleid, cursor):
+    cursor.execute(_SAMPLE.replace(
+        "#",
+        str(sampleid)
+    ))
+    sample = dictfetchall(cursor)[0]
+    tipo_fracionamento = obter_tipo_fracionamento(sample['type'])
+
+    cursor.execute(_FRACIONAMENTOS.replace(
+        "#",
+        str(sampleid)
+    ))
+    fracionamentos = dictfetchall(cursor)
+    for fracionamento in fracionamentos:
+        print(f"Importando fracao {fracionamento['fractionationid']}")
+        n_aliquota = Aliquota()
+        n_aliquota.tipo = obter_tipo_de_aliquota()
+        n_aliquota.data = datetime.now()
+        n_aliquota.amostra = orgao
+        n_aliquota.save()
+
+        n_fracionamento = Fracionamento()
+        n_fracionamento.aliquota = n_aliquota
+        n_fracionamento.tipo_de_fracionamento = tipo_fracionamento
+        n_fracionamento.protocolo = fracionamento['frac_protocol']
+        n_fracionamento.save()
+
+def importar_fracoes(fracionamento, fractionationid, cursor):
+    pass
 
 
 class Command(BaseCommand):

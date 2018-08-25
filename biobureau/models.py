@@ -194,7 +194,7 @@ class TipoDeFracionamento(models.Model):
 class Fracionamento(models.Model):
     aliquota = models.OneToOneField('Aliquota')
     tipo_de_fracionamento = models.ForeignKey('TipoDeFracionamento')
-    
+    protocolo = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         if self:
