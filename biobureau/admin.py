@@ -1,28 +1,30 @@
 from django.contrib import admin
 from .models import (
-    Amostra,
+    Especime,
     ClasseQuimica,
     Especie,
     Eluente,
-    Extrato,
+    Aliquota,
     Familia,
     Fracao,
     Fracionamento,
     Genero,
     OrgaoDePlanta,
-    ParteDePlanta,
+    Amostra,
     Sequenciamento,
-    TipoDeExtrato,
+    TipoDeAliquota,
+    TipoDeFracionamento,
+    Composto
 )
 
 
-class AmostraAdmin(admin.ModelAdmin):
+class EspecimeAdmin(admin.ModelAdmin):
     list_display = (
         '__str__', 'data_da_coleta', 'lat', 'lng',
         'altitude', 'solo', 'vegetacao', 'altura', 'diametro', 'notas') 
 
 
-class ExtratoAdmin(admin.ModelAdmin):
+class AliquotaAdmin(admin.ModelAdmin):
     list_display = (
         '__str__', 'tipo'
     )
@@ -38,21 +40,31 @@ class FracaoAdmin(admin.ModelAdmin):
         '__str__', 'eluente'
     )
 
+
 class FracionamentoAdmin(admin.ModelAdmin):
     list_display = (
-        '__str__', 'classe_quimica', 'positivo'
+        '__str__',
     )
 
-admin.site.register(Amostra, AmostraAdmin)
+
+class CompostoAdmin(admin.ModelAdmin):
+    list_display = (
+        '__str__', 'fracao', 'classe_quimica'
+    )
+
+
+admin.site.register(Especime, EspecimeAdmin)
 admin.site.register(ClasseQuimica)
 admin.site.register(Especie)
 admin.site.register(Eluente, EluenteAdmin)
-admin.site.register(Extrato, ExtratoAdmin)
+admin.site.register(Aliquota, AliquotaAdmin)
 admin.site.register(Familia)
 admin.site.register(Fracao, FracaoAdmin)
 admin.site.register(Fracionamento, FracionamentoAdmin)
 admin.site.register(Genero)
 admin.site.register(OrgaoDePlanta)
-admin.site.register(ParteDePlanta)
+admin.site.register(Amostra)
 admin.site.register(Sequenciamento)
-admin.site.register(TipoDeExtrato)
+admin.site.register(TipoDeAliquota)
+admin.site.register(Composto, CompostoAdmin)
+admin.site.register(TipoDeFracionamento)

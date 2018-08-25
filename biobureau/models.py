@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 
 class Familia(models.Model):
@@ -64,15 +65,18 @@ class OrgaoDePlanta(models.Model):
             return self.orgao
 
 
-class Amostra(models.Model):
+class Especime(models.Model):
     """Dados cadastrais da coleta de uma amostra de planta.
        Aqui estarão armazenados os dados da coleta da 
        planta (sua esécie, tamanho, local, etc.)"""
+    class Meta:
+        verbose_name = 'Espécime'
+
     identificador = models.UUIDField(
         editable=False,
         default=uuid.uuid4
         )
-    especie = models.ForeignKey('Especie')
+    especie = models.ForeignKey('Especie', verbose_name='Espécie')
     data_da_coleta = models.DateTimeField(blank=True, null=True)
     lat = models.FloatField(blank=True, null=True)
     lng = models.FloatField(blank=True, null=True)
@@ -86,7 +90,21 @@ class Amostra(models.Model):
     )
     altura = models.FloatField(blank=True, null=True)
     diametro = models.FloatField(verbose_name="Diâmetro", blank=True, null=True)
+    ponto_de_referencia = models.CharField(max_length=200, blank=True, null=True)
     notas = models.TextField(blank=True, null=True)
+    nome_comum = models.CharField(blank=True, null=True, max_length=200)
+    autor = models.CharField(max_length=200, blank=True, null=True)
+    light = models.IntegerField(blank=True, null=True)
+    abund = models.IntegerField(blank=True, null=True)
+    photonum = ArrayField(
+        models.IntegerField(blank=True, null=True),
+        blank=True, null=True
+    )
+    numero_individuos = models.IntegerField(blank=True, null=True)
+    etnologico = models.CharField(max_length=200, blank=True, null=True)
+    identid = models.IntegerField(blank=True, null=True)
+    nome_erva = models.CharField(max_length=200, blank=True, null=True)
+    data_erva = models.DateField(blank=True, null=True)
 
     def __str__(self):
         if self:
@@ -96,11 +114,10 @@ class Amostra(models.Model):
             )
 
 
-
-class ParteDePlanta(models.Model):
+class Amostra(models.Model):
     "Dados da parte da planta coletada no campo"
     orgao = models.ForeignKey('OrgaoDePlanta')
-    amostra = models.ForeignKey('Amostra')
+    amostra = models.ForeignKey('Especime')
     cor = models.CharField(max_length=50, blank=True, null=True)
     cheiro = models.CharField(max_length=50, blank=True, null=True)
     peso = models.FloatField(blank=True, null=True)
@@ -123,7 +140,6 @@ class Eluente(models.Model):
             return self.nome
 
 
-
 class ClasseQuimica(models.Model):
     nome = models.CharField(max_length=50)
     def __str__(self):
@@ -131,31 +147,61 @@ class ClasseQuimica(models.Model):
             return self.nome
 
 
-class TipoDeExtrato(models.Model):
+class TipoDeAliquota(models.Model):
+    class Meta:
+        verbose_name = 'Tipo de Alíquota'
+        verbose_name_plural = 'Tipos de Alíquota'
+
     nome = models.CharField(max_length=50)
     def __str__(self):
         if self:
             return self.nome
 
 
-class Extrato(models.Model):
+class Aliquota(models.Model):
+    class Meta:
+        verbose_name = 'Alíquota'
+        verbose_name_plural = 'Alíquotas'
     data = models.DateField()
-    tipo = models.ForeignKey('TipoDeExtrato')
-    parte_de_planta = models.ForeignKey('ParteDePlanta')
+    tipo = models.ForeignKey('TipoDeAliquota')
+    amostra = models.ForeignKey('Amostra')
 
     def __str__(self):
         if self:
-            return str(self.parte_de_planta)
+            return str(self.amostra)
 
 
 class Sequenciamento(models.Model):
     data = models.DateField(verbose_name="Data do Sequenciamento Genético")
-    extrato = models.ForeignKey('Extrato')
+    aliquota = models.ForeignKey('Aliquota')
     arquivo_fasta = models.CharField(max_length=1000)
 
     def __str__(self):
         if self:
-            return str(self.extrato)
+            return str(self.aliquota)
+
+
+class TipoDeFracionamento(models.Model):
+    class Meta:
+        verbose_name = 'Tipo de Fracionamento'
+        verbose_name_plural = 'Tipos de Fracionamento'
+    nome = models.CharField(max_length=50)
+    def __str__(self):
+        if self:
+            return self.nome
+
+
+class Fracionamento(models.Model):
+    aliquota = models.OneToOneField('Aliquota')
+    tipo_de_fracionamento = models.ForeignKey('TipoDeFracionamento')
+    
+
+    def __str__(self):
+        if self:
+            return "%s-F%s" % (
+                self.aliquota,
+                self.id
+            )
 
 
 class Fracao(models.Model):
@@ -163,25 +209,32 @@ class Fracao(models.Model):
         verbose_name = "Fração"
         verbose_name_plural = "Frações"
 
-    extrato = models.ForeignKey('Extrato')
     eluente = models.ForeignKey('Eluente')
-
-    def __str__(self):
-        if self:
-            return "%s-F%s" % (
-                self.extrato,
-                self.id
-            )
-
-
-class Fracionamento(models.Model):
-    fracao = models.ForeignKey('Fracao')
-    classe_quimica = models.ForeignKey('ClasseQuimica')
-    positivo = models.BooleanField()
+    fracionamento = models.ForeignKey('Fracionamento')
 
     def __str__(self):
         if self:
             return "%sFR%s" % (
-                self.fracao,
+                self.fracionamento,
                 self.id
             )
+
+
+class Composto(models.Model):
+    fracao = models.ForeignKey('Fracao')
+    classe_quimica = models.ForeignKey('ClasseQuimica')
+    positivo = models.BooleanField()
+    notas = models.TextField(blank=True, null=True)
+    percentual_de_pureza = models.FloatField(blank=True, null=True)
+    notas_sobre_pureza = models.TextField(blank=True, null=True)
+    quantidade = models.FloatField(blank=True, null=True)
+    volume = models.FloatField(blank=True, null=True)
+    solvente = models.CharField(max_length=50, blank=True, null=True)
+    mw = models.FloatField(blank=True, null=True)
+    formula = models.CharField(max_length=50, blank=True, null=True)
+    nome_comum = models.CharField(max_length=50, blank=True, null=True)
+    nome_IUPAC = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        if self:
+            return self.nome_comum
