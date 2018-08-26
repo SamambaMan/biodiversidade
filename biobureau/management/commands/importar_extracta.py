@@ -14,7 +14,12 @@ from biobureau.models import (
     Fracionamento,
     TipoDeFracionamento,
     TipoDeAliquota,
-    Fracao
+    Fracao,
+    Composto,
+    DadosTLC,
+    PlacaTLC,
+    Eluente,
+    ClasseQuimica
 )
 from datetime import datetime
 
@@ -27,6 +32,10 @@ def dictfetchall(cursor):
     ]
 
 def limpabanco():
+    DadosTLC.objects.all().delete()
+    PlacaTLC.objects.all().delete()
+    Composto.objects.all().delete()
+    Fracao.objects.all().delete()
     Fracionamento.objects.all().delete()
     Aliquota.objects.all().delete()
     Fracionamento.objects.all().delete()
@@ -47,7 +56,10 @@ _ORGAOS = "select * from tplantorgan where tplantid = #"
 _FRACIONAMENTOS = "select * from fractionation where pfssampleid = #"
 _SAMPLE = "select * from sample where sampleid = #"
 _FRACOES = "select * from fraction where fractionationid = #"
-
+_COMPOSTOS = "select * from compound where sampleid = #"
+_TLCDATA = "select * from tlcdata where sampleid = #"
+_TLCPLACA = "select * from tlcplate where tlcplateid = #"
+_CLASSE_QUIMICA = "select * from chemical_classes where chemclassid = #"
 
 def compara_sql(entrada):
     return (f" = '{entrada}'" if entrada  else " is null")
@@ -167,7 +179,7 @@ def importar_fracionamentos(orgao, sampleid, cursor):
     ))
     fracionamentos = dictfetchall(cursor)
     for fracionamento in fracionamentos:
-        print(f"Importando fracao {fracionamento['fractionationid']}")
+        print(f"Importando fracionamento {fracionamento['fractionationid']}")
         n_aliquota = Aliquota()
         n_aliquota.tipo = obter_tipo_de_aliquota()
         n_aliquota.data = datetime.now()
@@ -192,9 +204,103 @@ def importar_fracoes(fracionamento, fractionationid, cursor):
         str(fractionationid)
     ))
     fracoes = dictfetchall(cursor)
-
     for fracao in fracoes:
+        print(f"Importando fracao sample {fracao['sampleid']}")
         n_fracao = Fracao()
+        n_fracao.fracionamento = fracionamento
+        n_fracao.rt_inicial = fracao['rt_start']
+        n_fracao.rt_final = fracao['rt_end']
+        n_fracao.numero_fracao = fracao['frac_number']
+        n_fracao.notas = fracao['notes']
+        n_fracao.save()
+
+        importar_compostos(n_fracao, fracao['sampleid'], cursor)
+        importar_tlc(n_fracao, fracao['sampleid'], cursor)
+
+def importar_tlc(fracao, sampleid, cursor):
+    cursor.execute(_TLCDATA.replace(
+        "#",
+        str(sampleid)
+    ))
+    tlcdatas = dictfetchall(cursor)
+    for tlcdata in tlcdatas:
+        print(f"Importando TLCDATA sample {sampleid} ")
+        placa = importar_placa_tlc(tlcdata['tlcplateid'], cursor)
+        classe = importar_classe_quimica(tlcdata['chemclassid'])
+        n_tlc = DadosTLC()
+        n_tlc.placa = placa
+        n_tlc.classe_quimica = classe
+        n_tlc.quantidade = tlcdata['quantity']
+        n_tlc.linha = tlcdata['lane']
+        n_tlc.coluna = tlcdata['col']
+        n_tlc.resultado = tlcdata['result']
+        n_tlc.save()
+        
+
+@memoized
+def importar_classe_quimica(idclasse, cursor):
+    cursor.execute(_CLASSE_QUIMICA.replace(
+        "#",
+        str(idclasse)
+    ))
+    classes = dictfetchall(cursor)
+    for classe in classes:
+        nome = classe['classname']
+        existente = ClasseQuimica.objects.filter(nome=nome).first()
+        if existente:
+            return existente
+        n_classe = ClasseQuimica()
+        n_classe.nome = nome
+        n_classe.save()
+        return n_classe
+
+
+@memoized
+def importar_placa_tlc(idplaca, cursor):
+    n_placa = PlacaTLC.objects.filter(idextracta=idplaca).first()
+    if n_placa:
+        return n_placa
+
+    cursor.execute(_TLCPLACA.replace(
+        "#",
+        str(idplaca)
+    ))
+    placas = dictfetchall(cursor)
+    for placa in placas:
+        print(f"Importando placa TLC id {idplaca} ")
+        n_placa = PlacaTLC()
+        n_placa.numero_de_faixas = placa['nlanes']
+        n_placa.data_da_analise = placa['analdate']
+        n_placa.eluente = Eluente.objects.get(pk=placa['eluent_developer'])
+        n_placa.notas = placa['notes']
+        n_placa.idextracta = idplaca
+        n_placa.save()
+        return n_placa
+
+
+def importar_compostos(fracao, sampleid, cursor):
+    cursor.execute(_COMPOSTOS.replace(
+        "#",
+        str(sampleid)
+    ))
+    compostos = dictfetchall(cursor)
+    for composto in compostos:
+        print(f"Importando Composto")
+        n_composto = Composto()
+        n_composto.fracao = fracao
+        n_composto.data_isolamento = composto['isolationdate']
+        n_composto.depid = composto['depid']
+        n_composto.notas = composto['notas']
+        n_composto.percentual_de_pureza = composto['purity_pct']
+        n_composto.notas_sobre_pureza = composto['purity_notes']
+        n_composto.quantidade = composto['quantity']
+        n_composto.volume = composto['volume']
+        n_composto.solvente = composto['solvent']
+        n_composto.mw = composto['mw']
+        n_composto.formula = composto['formula']
+        n_composto.nome_IUPAC = composto['name_iupac']
+        n_composto.smiles = composto['smiles']
+        n_composto.save()
 
 
 class Command(BaseCommand):

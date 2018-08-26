@@ -14,7 +14,9 @@ from .models import (
     Sequenciamento,
     TipoDeAliquota,
     TipoDeFracionamento,
-    Composto
+    Composto,
+    PlacaTLC,
+    DadosTLC
 )
 
 
@@ -68,3 +70,5 @@ admin.site.register(Sequenciamento)
 admin.site.register(TipoDeAliquota)
 admin.site.register(Composto, CompostoAdmin)
 admin.site.register(TipoDeFracionamento)
+admin.site.register(PlacaTLC)
+admin.site.register(DadosTLC)
