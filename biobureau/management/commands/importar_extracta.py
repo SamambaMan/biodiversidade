@@ -226,7 +226,7 @@ def importar_tlc(fracao, sampleid, cursor):
     for tlcdata in tlcdatas:
         print(f"Importando TLCDATA sample {sampleid} ")
         placa = importar_placa_tlc(tlcdata['tlcplateid'], cursor)
-        classe = importar_classe_quimica(tlcdata['chemclassid'])
+        classe = importar_classe_quimica(tlcdata['chemclassid'], cursor)
         n_tlc = DadosTLC()
         n_tlc.placa = placa
         n_tlc.classe_quimica = classe
