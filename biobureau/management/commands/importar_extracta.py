@@ -13,7 +13,8 @@ from biobureau.models import (
     Aliquota,
     Fracionamento,
     TipoDeFracionamento,
-    TipoDeAliquota
+    TipoDeAliquota,
+    Fracao
 )
 from datetime import datetime
 
@@ -45,6 +46,7 @@ _PLANTAS = "select * from tplant where species # and genus $ and family @"
 _ORGAOS = "select * from tplantorgan where tplantid = #"
 _FRACIONAMENTOS = "select * from fractionation where pfssampleid = #"
 _SAMPLE = "select * from sample where sampleid = #"
+_FRACOES = "select * from fraction where fractionationid = #"
 
 
 def compara_sql(entrada):
@@ -178,8 +180,21 @@ def importar_fracionamentos(orgao, sampleid, cursor):
         n_fracionamento.protocolo = fracionamento['frac_protocol']
         n_fracionamento.save()
 
+        importar_fracoes(
+            n_fracionamento,
+            fracionamento['fractionationid'],
+            cursor
+        )
+
 def importar_fracoes(fracionamento, fractionationid, cursor):
-    pass
+    cursor.execute(_FRACOES.replace(
+        "#",
+        str(fractionationid)
+    ))
+    fracoes = dictfetchall(cursor)
+
+    for fracao in fracoes:
+        n_fracao = Fracao()
 
 
 class Command(BaseCommand):

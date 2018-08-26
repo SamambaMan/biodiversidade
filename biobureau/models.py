@@ -134,7 +134,8 @@ class Amostra(models.Model):
 
 class Eluente(models.Model):
     nome = models.CharField(max_length=100)
-    polar = models.BooleanField()
+    classe = models.CharField(max_length=100, default="Polar")
+    composicao = models.CharField(max_length=100, null=True, blank=True)
     def __str__(self):
         if self:
             return self.nome
@@ -209,7 +210,10 @@ class Fracao(models.Model):
         verbose_name = "Fração"
         verbose_name_plural = "Frações"
 
-    eluente = models.ForeignKey('Eluente')
+    rt_inicial = models.FloatField(null=True, blank=True)
+    rt_final = models.FloatField(null=True, blank=True)
+    numero_fracao = models.IntegerField(null=True, blank=True)
+    notas = models.TextField(blank=True, null=True)
     fracionamento = models.ForeignKey('Fracionamento')
 
     def __str__(self):
@@ -220,10 +224,35 @@ class Fracao(models.Model):
             )
 
 
+class DadosTLC(models.Model):
+    class Meta:
+        verbose_name = "Dados TLC"
+        verbose_name_plural = "Dados TLC"
+    
+    fracao = models.ForeignKey('Fracao')
+    placa = models.ForeignKey('PlacaTLC')
+    quantidade = models.FloatField(null=True, blank=True)
+    linha = models.IntegerField(null=True, blank=True)
+    coluna = models.IntegerField(null=True, blank=True)
+    classe_quimica = models.ForeignKey('ClasseQuimica')
+    resultado = models.BooleanField(default=False)
+    tipo_composto_tlc = models.IntegerField(null=True, blank=True)
+
+
+class PlacaTLC(models.Model):
+    """Agregador de Dados TLC"""
+    numero_de_faixas = models.IntegerField(blank=True, null=True)
+    data_da_analise = models.DateField(blank=True, null=True)
+    imagem = models.ImageField(blank=True, null=True)
+    eluente = models.ForeignKey('Eluente')
+    notas = models.TextField(blank=True, null=True)
+    idextracta = models.IntegerField(blank=True, null=True)
+
+
 class Composto(models.Model):
     fracao = models.ForeignKey('Fracao')
-    classe_quimica = models.ForeignKey('ClasseQuimica')
-    positivo = models.BooleanField()
+    data_isolamento = models.DateField(null=True, blank=True)
+    depid = models.IntegerField(blank=True, null=True)
     notas = models.TextField(blank=True, null=True)
     percentual_de_pureza = models.FloatField(blank=True, null=True)
     notas_sobre_pureza = models.TextField(blank=True, null=True)
@@ -234,6 +263,7 @@ class Composto(models.Model):
     formula = models.CharField(max_length=50, blank=True, null=True)
     nome_comum = models.CharField(max_length=50, blank=True, null=True)
     nome_IUPAC = models.CharField(max_length=50, blank=True, null=True)
+    smiles = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         if self:

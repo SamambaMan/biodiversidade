@@ -31,13 +31,13 @@ class AliquotaAdmin(admin.ModelAdmin):
 
 class EluenteAdmin(admin.ModelAdmin):
     list_display = (
-        'nome', 'polar'
+        'nome', 
     )
 
 
 class FracaoAdmin(admin.ModelAdmin):
     list_display = (
-        '__str__', 'eluente'
+        '__str__',
     )
 
 
@@ -49,7 +49,7 @@ class FracionamentoAdmin(admin.ModelAdmin):
 
 class CompostoAdmin(admin.ModelAdmin):
     list_display = (
-        '__str__', 'fracao', 'classe_quimica'
+        '__str__', 'fracao'
     )
 
 
