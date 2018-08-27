@@ -21,7 +21,7 @@ class Genero(models.Model):
 
     nome = models.CharField(max_length=100)
     familia = models.ForeignKey('Familia')
-    
+
     def __str__(self):
         if self:
             return "%s %s" % (self.familia, self.nome)
@@ -33,7 +33,7 @@ class Especie(models.Model):
        de espécies de plantas disponíveis"""
     class Meta:
         verbose_name = "Espécie"
-    
+
     nome = models.CharField(max_length=100)
     common = models.CharField(
         max_length=200,
@@ -67,7 +67,7 @@ class OrgaoDePlanta(models.Model):
 
 class Especime(models.Model):
     """Dados cadastrais da coleta de uma amostra de planta.
-       Aqui estarão armazenados os dados da coleta da 
+       Aqui estarão armazenados os dados da coleta da
        planta (sua esécie, tamanho, local, etc.)"""
     class Meta:
         verbose_name = 'Espécime'
@@ -101,7 +101,7 @@ class Especime(models.Model):
         blank=True, null=True
     )
     numero_individuos = models.IntegerField(blank=True, null=True)
-    etnologico = models.CharField(max_length=200, blank=True, null=True)
+    etnologico = models.TextField(blank=True, null=True)
     identid = models.IntegerField(blank=True, null=True)
     nome_erva = models.CharField(max_length=200, blank=True, null=True)
     data_erva = models.DateField(blank=True, null=True)
@@ -228,14 +228,15 @@ class DadosTLC(models.Model):
     class Meta:
         verbose_name = "Dados TLC"
         verbose_name_plural = "Dados TLC"
-    
-    fracao = models.ForeignKey('Fracao')
+
+    fracao = models.ForeignKey('Fracao', null=True, blank=True)
+    fracionamento = models.ForeignKey('Fracionamento', null=True, blank=True)
     placa = models.ForeignKey('PlacaTLC')
     quantidade = models.FloatField(null=True, blank=True)
     linha = models.IntegerField(null=True, blank=True)
     coluna = models.IntegerField(null=True, blank=True)
-    classe_quimica = models.ForeignKey('ClasseQuimica')
-    resultado = models.BooleanField(default=False)
+    classe_quimica = models.ForeignKey('ClasseQuimica', blank=True, null=True)
+    resultado = models.NullBooleanField(default=False)
     tipo_composto_tlc = models.IntegerField(null=True, blank=True)
 
 
@@ -244,7 +245,7 @@ class PlacaTLC(models.Model):
     numero_de_faixas = models.IntegerField(blank=True, null=True)
     data_da_analise = models.DateField(blank=True, null=True)
     imagem = models.ImageField(blank=True, null=True)
-    eluente = models.ForeignKey('Eluente')
+    eluente = models.ForeignKey('Eluente', null=True, blank=True)
     notas = models.TextField(blank=True, null=True)
     idextracta = models.IntegerField(blank=True, null=True)
 

@@ -46,7 +46,7 @@ def limpabanco():
     Especie.objects.all().delete()
     Genero.objects.all().delete()
     Familia.objects.all().delete()
-    
+
 
 _FAMILIAS = "select distinct(family) from tplant"
 _GENEROS = "select distinct(genus) from tplant where family #"
@@ -142,7 +142,7 @@ def importar_orgaos_planta(planta, idplanta, cursor):
         n_amostra.notas = orgao['notes']
 
         n_amostra.save()
-        
+
         importar_fracionamentos(n_amostra, orgao['sampleid'], cursor)
 
 @memoized
@@ -192,6 +192,14 @@ def importar_fracionamentos(orgao, sampleid, cursor):
         n_fracionamento.protocolo = fracionamento['frac_protocol']
         n_fracionamento.save()
 
+        importar_tlc(
+            None,
+            fracionamento['pfssampleid'],
+            cursor,
+            n_fracionamento
+        )
+
+
         importar_fracoes(
             n_fracionamento,
             fracionamento['fractionationid'],
@@ -217,7 +225,7 @@ def importar_fracoes(fracionamento, fractionationid, cursor):
         importar_compostos(n_fracao, fracao['sampleid'], cursor)
         importar_tlc(n_fracao, fracao['sampleid'], cursor)
 
-def importar_tlc(fracao, sampleid, cursor):
+def importar_tlc(fracao, sampleid, cursor, fracionamento=None):
     cursor.execute(_TLCDATA.replace(
         "#",
         str(sampleid)
@@ -229,6 +237,7 @@ def importar_tlc(fracao, sampleid, cursor):
         classe = importar_classe_quimica(tlcdata['chemclassid'], cursor)
         n_tlc = DadosTLC()
         n_tlc.fracao = fracao
+        n_tlc.fracionamento = fracionamento
         n_tlc.placa = placa
         n_tlc.classe_quimica = classe
         n_tlc.quantidade = tlcdata['quantity']
@@ -236,10 +245,12 @@ def importar_tlc(fracao, sampleid, cursor):
         n_tlc.coluna = tlcdata['col']
         n_tlc.resultado = tlcdata['result']
         n_tlc.save()
-        
+
 
 @memoized
 def importar_classe_quimica(idclasse, cursor):
+    if not idclasse:
+        return None
     cursor.execute(_CLASSE_QUIMICA.replace(
         "#",
         str(idclasse)
@@ -272,7 +283,7 @@ def importar_placa_tlc(idplaca, cursor):
         n_placa = PlacaTLC()
         n_placa.numero_de_faixas = placa['nlanes']
         n_placa.data_da_analise = placa['analdate']
-        n_placa.eluente = Eluente.objects.get(pk=placa['eluent_developer'])
+        n_placa.eluente = Eluente.objects.get(pk=placa['eluent_developer']) if placa['eluent_developer'] else None
         n_placa.notas = placa['notes']
         n_placa.idextracta = idplaca
         n_placa.save()
@@ -336,7 +347,7 @@ class Command(BaseCommand):
                         ).replace(
                             "$",
                             compara_sql(familia['family'])
-                        )  
+                        )
                     )
                     especies = dictfetchall(cursor)
                     for especie in especies:
