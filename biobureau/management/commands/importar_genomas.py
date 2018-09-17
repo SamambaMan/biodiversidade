@@ -262,7 +262,7 @@ class Command(BaseCommand):
         limpabanco()
         print('Contando biodiversidades')
         items = Biodiversidade.objects.filter(algorithm='diamond')
-        nbio = 100 # items.count()
+        nbio = items.count()
         print('Começando a brincadeira')
         for i in tqdm(range(nbio)):
             biodiversidade = items[i]
