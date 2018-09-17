@@ -24,7 +24,7 @@ class Genero(models.Model):
 
     def __str__(self):
         if self:
-            return "%s %s" % (self.familia, self.nome)
+            return self.nome
 
 
 class Especie(models.Model):
@@ -44,7 +44,7 @@ class Especie(models.Model):
 
     def __str__(self):
         if self:
-            return "%s %s" % (self.genero, self.nome)
+            return self.nome
 
 
 class OrgaoDePlanta(models.Model):
@@ -169,17 +169,59 @@ class Aliquota(models.Model):
 
     def __str__(self):
         if self:
-            return str(self.amostra)
+            return self.data
+
+
+class Algoritmo(models.Model):
+    nome = models.CharField(max_length=200)
+
+
+class GeneOntology(models.Model):
+    nome = models.CharField(max_length=200)
+
+
+class GeneInfo(models.Model):
+    identificacao = models.IntegerField()
+
+
+class Database(models.Model):
+    nome = models.CharField(max_length=200)
 
 
 class Sequenciamento(models.Model):
     data = models.DateField(verbose_name="Data do Sequenciamento Genético")
     aliquota = models.ForeignKey('Aliquota')
-    arquivo_fasta = models.CharField(max_length=1000)
+    arquivo_fasta = models.CharField(max_length=1000, null=True, blank=True)
+    algoritmo = models.ForeignKey('Algoritmo', blank=True, null=True)
+    database = models.ForeignKey('Database', blank=True, null=True)
 
     def __str__(self):
         if self:
-            return str(self.aliquota)
+            return str(self.data)
+
+
+class Sequencia(models.Model):
+    sequenciamento = models.ForeignKey('Sequenciamento')
+    qseqid = models.CharField(max_length=200, null=True, blank=True, help_text="qseqid")
+    sseqid = models.CharField(max_length=200, null=True, blank=True, help_text="sseqid")
+    pident = models.CharField(max_length=200, null=True, blank=True, help_text="pident")
+    length = models.CharField(max_length=200, null=True, blank=True, help_text="length")
+    mismatch = models.CharField(max_length=200, null=True, blank=True, help_text="mismatch")
+    gapopen = models.CharField(max_length=200, null=True, blank=True, help_text="gapopen")
+    qstart = models.CharField(max_length=200, null=True, blank=True, help_text="qstart")
+    qend = models.CharField(max_length=200, null=True, blank=True, help_text="qend")
+    sstart = models.CharField(max_length=200, null=True, blank=True, help_text="sstart")
+    send = models.CharField(max_length=200, null=True, blank=True, help_text="send")
+    evalue = models.CharField(max_length=200, null=True, blank=True, help_text="evalue")
+    bitscore = models.CharField(max_length=200, null=True, blank=True, help_text="bitscore")
+    geneinfo = models.ManyToManyField('GeneInfo')
+    geneid = models.CharField(max_length=200, null=True, blank=True, verbose_name="GeneID", help_text="geneid")
+    ncbitaxon = models.CharField(max_length=200, null=True, blank=True, verbose_name="NCBI-taxon", help_text="ncbitaxon")
+    ltaxon = models.CharField(max_length=200, null=True, blank=True, verbose_name="Lowest taxon of the cluster", help_text="ltaxon")
+    repid = models.CharField(max_length=200, null=True, blank=True, verbose_name="RepID", help_text="repid")
+    clustername = models.CharField(max_length=500, null=True, blank=True, verbose_name="Cluster Name", help_text="clustername")
+    geneontology = models.ManyToManyField('GeneOntology')
+    station = models.CharField(max_length=255, blank=True, null=True)
 
 
 class TipoDeFracionamento(models.Model):
@@ -197,13 +239,6 @@ class Fracionamento(models.Model):
     tipo_de_fracionamento = models.ForeignKey('TipoDeFracionamento')
     protocolo = models.IntegerField(blank=True, null=True)
 
-    def __str__(self):
-        if self:
-            return "%s-F%s" % (
-                self.aliquota,
-                self.id
-            )
-
 
 class Fracao(models.Model):
     class Meta:
@@ -216,12 +251,6 @@ class Fracao(models.Model):
     notas = models.TextField(blank=True, null=True)
     fracionamento = models.ForeignKey('Fracionamento')
 
-    def __str__(self):
-        if self:
-            return "%sFR%s" % (
-                self.fracionamento,
-                self.id
-            )
 
 
 class DadosTLC(models.Model):
