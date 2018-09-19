@@ -1,8 +1,10 @@
 from django.core.management import BaseCommand
 from memoized import memoized
 from datetime import datetime
-import csv, io, requests
-from tqdm import tqdm
+from django.db import transaction
+import csv, io, requests, time
+from tqdm import tqdm, trange
+from multiprocessing.dummy import Pool
 from biobureau.models import (
     Familia,
     Genero,
@@ -23,14 +25,79 @@ from listagens.models import (
     Biodiversidade
 )
 
+
+familybase = {'Cedrela fissilis': 'Meliaceae',
+         'Annona dolabripetala': 'Annonaceae',
+          'Lantana trifolia': 'Verbenaceae',
+           'Maytenus aquifolia': 'Celastraceae',
+            'Anthurium pentaphyllum': 'Araceae',
+             'Solanum americanum': 'Solanaceae',
+              'Solanum lycocarpum': 'Solanaceae',
+               'Inga edulis': 'Leguminosae',
+                'Schizolobium paratyba': 'Leguminosae',
+                 'Myrsine umbellata': 'Primulaceae',
+                  'Annona sylvatica': 'Annonaceae',
+                   'Alchornea sidifolia': 'Euphorbiaceae',
+                    'Myrceugenia myrcioides': 'Myrtaceae',
+                     'Senna multijuga': 'Leguminosae',
+                      'Xylopia brasiliensis': 'Annonaceae',
+                       'Prestonia coalita': 'Apocynaceae',
+                        'Cabralea canjerana': 'Meliaceae',
+                         'Sphagneticola trilobata': 'Compositae',
+                          'Centella asiatica': 'Apiaceae',
+                           'Justicia carnea': 'Acanthaceae',
+                            'Guarea macrophylla': 'Meliaceae',
+                             'Mimosa pudica': 'Leguminosae',
+                              'Achyrocline alata': 'Compositae',
+                               'Sida rhombifolia': 'Malvaceae',
+                                'Solanum pseudoquina': 'Solanaceae',
+                                 'Ocotea odorifera': 'Lauraceae',
+                                  'Protium kleinii': 'Burseraceae',
+                                   'Ludwigia octovalvis': 'Onagraceae',
+                                    'Aspidosperma olivaceum': 'Apocynaceae',
+                                     'Bactris setosa': 'Arecaceae',
+                                      'Peltastes peltatus': 'Apocynaceae',
+                                       'Psychotria vellosiana': 'Rubiaceae',
+                                        'Piptadenia gonoacantha': 'Leguminosae',
+                                         'Solanum castaneum': 'Solanaceae',
+                                          'Jaegeria hirta': 'Compositae',
+                                           'Guatteria australis': 'Annonaceae',
+                                            'Asclepias curassavica': 'Apocynaceae',
+                                             'Hedychium coronarium': 'Zingiberaceae',
+                                              'Monstera adansonii': 'Araceae',
+                                               'Baccharis semiserrata': 'Compositae',
+                                                'Zanthoxylum rhoifolium': 'Rutaceae',
+                                                 'Maprounea guianensis': 'Euphorbiaceae',
+                                                  'Mikania micrantha': 'Compositae',
+                                                   'Astrocaryum aculeatissimum': 'Arecaceae',
+                                                    'Stachytarpheta cayennennsis': 'Verbenaceae',
+                                                     'Solanum swartzianum': 'Solanaceae',
+                                                      'Nectandra leucantha': 'Lauraceae',
+                                                       'Piper gaudichaudianum': 'Piperaceae',
+                                                        'Scoparia dulcis': 'Plantaginaceae',
+                                                         'Casearia sylvestris': 'Salicaceae'}
+
+
 @memoized
 def findfamily(genus, species):
     address = f'http://www.theplantlist.org/tpl1.1/search?q={genus}%20{species}&csv=true'
 
-    response = requests.get(
-        address,
-        timeout=10
-    )
+    retry = 0
+    erro = None
+    while retry < 10:
+        try:
+            response = requests.get(
+                address,
+                timeout=10
+            )
+        except Exception as error:
+            time.sleep(1)
+            retry += 1
+            erro = error
+    else:
+        print(f'Retry {retry} com error {erro}')
+        print(address)
+        raise Exception("Tentei familia demais")
 
     reader = csv.DictReader(
         io.StringIO(
@@ -52,7 +119,7 @@ def obter_tipodealiquota():
         n_tipo_aliquota = TipoDeAliquota()
         n_tipo_aliquota.nome = "Sequenciamento"
         n_tipo_aliquota.save()
-    return n_tipo_aliquota 
+    return n_tipo_aliquota
 
 
 @memoized
@@ -63,7 +130,7 @@ def obter_algoritmo(algoritmo):
         n_algoritmo = Algoritmo()
         n_algoritmo.nome = algoritmo
         n_algoritmo.save()
-    
+
     return n_algoritmo
 
 
@@ -81,7 +148,7 @@ def obter_database(database):
 
 @memoized
 def gerar_especie_aliquota(genero, especie, algoritmo, database):
-    familia = findfamily(genero, especie)
+    familia = familybase[f'{genero} {especie}']
 
     n_especie = obter_especie(familia, genero, especie)
 
@@ -103,7 +170,7 @@ def gerar_especie_aliquota(genero, especie, algoritmo, database):
         n_amostra.orgao = OrgaoDePlanta.objects.filter(orgao='Leaf').first()
         n_amostra.amostra = n_especime
         n_amostra.save()
-    
+
     n_tipo_aliquota = obter_tipodealiquota()
 
     n_aliquota = Aliquota.objects.filter(
@@ -117,7 +184,7 @@ def gerar_especie_aliquota(genero, especie, algoritmo, database):
         n_aliquota.tipo = n_tipo_aliquota
         n_aliquota.amostra = n_amostra
         n_aliquota.save()
-    
+
     n_algoritmo = obter_algoritmo(algoritmo)
     n_database = obter_database(database)
 
@@ -134,7 +201,7 @@ def gerar_especie_aliquota(genero, especie, algoritmo, database):
         n_sequenciamento.algoritmo = n_algoritmo
         n_sequenciamento.aliquota = n_aliquota
         n_sequenciamento.save()
-    
+
     return n_sequenciamento
 
 
@@ -146,7 +213,7 @@ def obter_especie(familia, genero, especie):
         n_familia = Familia()
         n_familia.nome = familia
         n_familia.save()
-    
+
     n_genero = Genero.objects.filter(
         nome=genero,
         familia__id=n_familia.id
@@ -157,7 +224,7 @@ def obter_especie(familia, genero, especie):
         n_genero.nome = genero
         n_genero.familia = n_familia
         n_genero.save()
-    
+
     n_especie = Especie.objects.filter(
         nome=especie,
         genero__id=n_genero.id
@@ -168,7 +235,7 @@ def obter_especie(familia, genero, especie):
         n_especie.genero = n_genero
         n_especie.nome = especie
         n_especie.save()
-    
+
     return n_especie
 
 
@@ -204,7 +271,7 @@ def obter_go(go):
         n_go = GeneOntology()
         n_go.nome = go
         n_go.save()
-    
+
     return n_go
 
 
@@ -257,25 +324,45 @@ def incluir_sequencia(sequenciamento, biodiversidade):
         )
 
 
+
+def processar_biodiversidade(biodiversidade):
+    genero, especie = biodiversidade.species.split()
+    sequenciamento = gerar_especie_aliquota(
+                    genero,
+                    especie,
+                    biodiversidade.algorithm,
+                    biodiversidade.database)
+
+    incluir_sequencia(
+                    sequenciamento,
+                    biodiversidade
+                )
+
+
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        limpabanco()
+        # limpabanco()
         print('Contando biodiversidades')
         items = Biodiversidade.objects.filter(algorithm='diamond')
         nbio = items.count()
+        nseqs = Sequencia.objects.all().count()
         print('Começando a brincadeira')
-        for i in tqdm(range(nbio)):
-            biodiversidade = items[i]
+        pool = Pool(10)
 
-            genero, especie = biodiversidade.species.split()
-            sequenciamento = gerar_especie_aliquota(
-                genero,
-                especie,
-                biodiversidade.algorithm,
-                biodiversidade.database)
-            
-            incluir_sequencia(
-                sequenciamento,
-                biodiversidade
-            )
+        nbloco = 10000
+        # particiona em blocos de processamento
+        for bloco in trange(int((nbio-nseqs)/nbloco)):
+            inicio = (bloco*nbloco)+nseqs
+            fim = (bloco*nbloco)+nseqs+nbloco
+            estes_itens = list(items[inicio:fim])
+
+            with transaction.atomic():
+                list(tqdm(pool.imap(
+                        processar_biodiversidade,
+                        estes_itens,
+                        chunksize=50),
+                    total=nbloco)
+                    )
+
 
