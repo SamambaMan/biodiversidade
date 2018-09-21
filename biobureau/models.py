@@ -169,24 +169,33 @@ class Aliquota(models.Model):
 
     def __str__(self):
         if self:
-            return self.data
+            return str(self.data)
 
 
 class Algoritmo(models.Model):
     nome = models.CharField(max_length=200)
+    def __str__(self):
+        if self:
+            return self.nome
 
 
 class GeneOntology(models.Model):
     nome = models.CharField(max_length=200)
-
+    def __str__(self):
+        if self:
+            return self.nome
 
 class GeneInfo(models.Model):
     identificacao = models.IntegerField()
-
+    def __str__(self):
+        if self:
+            return str(self.identificacao)
 
 class Database(models.Model):
     nome = models.CharField(max_length=200)
-
+    def __str__(self):
+        if self:
+            return self.nome
 
 class Sequenciamento(models.Model):
     data = models.DateField(verbose_name="Data do Sequenciamento Genético")
@@ -194,6 +203,9 @@ class Sequenciamento(models.Model):
     arquivo_fasta = models.CharField(max_length=1000, null=True, blank=True)
     algoritmo = models.ForeignKey('Algoritmo', blank=True, null=True)
     database = models.ForeignKey('Database', blank=True, null=True)
+
+    def texto(self):
+        return str(self.data)
 
     def __str__(self):
         if self:
@@ -222,6 +234,10 @@ class Sequencia(models.Model):
     clustername = models.CharField(max_length=500, null=True, blank=True, verbose_name="Cluster Name", help_text="clustername")
     geneontology = models.ManyToManyField('GeneOntology')
     station = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        if self:
+            return self.qseqid
 
 
 class TipoDeFracionamento(models.Model):

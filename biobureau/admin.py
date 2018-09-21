@@ -16,7 +16,12 @@ from .models import (
     TipoDeFracionamento,
     Composto,
     PlacaTLC,
-    DadosTLC
+    DadosTLC,
+    Algoritmo,
+    GeneOntology,
+    GeneInfo,
+    Database,
+    Sequencia
 )
 
 
@@ -55,6 +60,25 @@ class CompostoAdmin(admin.ModelAdmin):
     )
 
 
+class SequenciaAdmin(admin.ModelAdmin):
+    list_display = (
+        'qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 
+        'qend', 'sstart', 'send', 'evalue', 'bitscore', 'geneid', 'ncbitaxon', 
+        'ltaxon', 'repid', 'clustername', 'station'
+    )
+
+
+class SequenciamentoAdmin(admin.ModelAdmin):
+    list_display = (
+        'data', 'algoritmo', 'database'
+    )
+
+    fields = ('data', 'algoritmo', 'database', 'texto')
+
+    def texto(self, obj):
+        return "lero"
+
+
 admin.site.register(Especime, EspecimeAdmin)
 admin.site.register(ClasseQuimica)
 admin.site.register(Especie)
@@ -66,9 +90,14 @@ admin.site.register(Fracionamento, FracionamentoAdmin)
 admin.site.register(Genero)
 admin.site.register(OrgaoDePlanta)
 admin.site.register(Amostra)
-admin.site.register(Sequenciamento)
+admin.site.register(Sequenciamento, SequenciamentoAdmin)
 admin.site.register(TipoDeAliquota)
 admin.site.register(Composto, CompostoAdmin)
 admin.site.register(TipoDeFracionamento)
 admin.site.register(PlacaTLC)
 admin.site.register(DadosTLC)
+admin.site.register(Algoritmo)
+admin.site.register(GeneOntology)
+admin.site.register(GeneInfo)
+admin.site.register(Database)
+admin.site.register(Sequencia, SequenciaAdmin)
