@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from .models import (
     Especime,
     ClasseQuimica,
@@ -21,7 +22,8 @@ from .models import (
     GeneOntology,
     GeneInfo,
     Database,
-    Sequencia
+    Sequencia,
+    FonteFamilia
 )
 
 
@@ -60,23 +62,58 @@ class CompostoAdmin(admin.ModelAdmin):
     )
 
 
+class SequenciaForm(forms.ModelForm):
+    class Meta:
+        model = Sequencia
+        fields = '__all__'
+    
+    gene_ontology = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.Textarea()
+    )
+    gene_identification = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.Textarea()
+    )
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+
+        kwargs.update(initial={
+            'gene_ontology': '; '.join(
+                x.nome for x in list(instance.geneontology.all())
+            ),
+            'gene_identification': '; '.join(
+                str(x.identificacao) for x in list(instance.geneinfo.all()
+            ))
+        })
+
+        super().__init__(*args, **kwargs)
+
 class SequenciaAdmin(admin.ModelAdmin):
+    form = SequenciaForm
     list_display = (
         'qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 
         'qend', 'sstart', 'send', 'evalue', 'bitscore', 'geneid', 'ncbitaxon', 
         'ltaxon', 'repid', 'clustername', 'station'
     )
 
+    fields = (
+        'qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 
+        'qend', 'sstart', 'send', 'evalue', 'bitscore', 'geneid', 'ncbitaxon', 
+        'ltaxon', 'repid', 'clustername', 'station', 'gene_ontology', 'gene_identification'
+    )
+
+
+
+
 
 class SequenciamentoAdmin(admin.ModelAdmin):
     list_display = (
         'data', 'algoritmo', 'database'
     )
-
-    fields = ('data', 'algoritmo', 'database', 'texto')
-
-    def texto(self, obj):
-        return "lero"
 
 
 admin.site.register(Especime, EspecimeAdmin)
@@ -101,3 +138,4 @@ admin.site.register(GeneOntology)
 admin.site.register(GeneInfo)
 admin.site.register(Database)
 admin.site.register(Sequencia, SequenciaAdmin)
+admin.site.register(FonteFamilia)

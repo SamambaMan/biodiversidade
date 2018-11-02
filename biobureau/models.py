@@ -3,12 +3,24 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 
+class FonteFamilia(models.Model):
+    class Meta:
+        verbose_name = 'Fonte de Família'
+        verbose_name_plural = 'Fontes de Família'
+
+    name = models.CharField(max_length=100)
+    def __str__(self):
+        if self:
+            return self.name
+
+
 class Familia(models.Model):
     "Armazena Famílias de espécies de plantas"
     class Meta:
         verbose_name = "Família"
 
     nome = models.CharField(max_length=100)
+    fonte = models.ManyToManyField('FonteFamilia')
     def __str__(self):
         if self:
             return self.nome
