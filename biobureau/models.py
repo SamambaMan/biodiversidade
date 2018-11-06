@@ -21,6 +21,8 @@ class Familia(models.Model):
 
     nome = models.CharField(max_length=100)
     fonte = models.ManyToManyField('FonteFamilia')
+    brasileira = models.BooleanField(default=False)
+    taxid = models.IntegerField(blank=True, null=True)
     def __str__(self):
         if self:
             return self.nome

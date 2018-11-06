@@ -116,12 +116,16 @@ class SequenciamentoAdmin(admin.ModelAdmin):
     )
 
 
+class FamiliaAdmin(admin.ModelAdmin):
+    search_fields = ['nome']
+
+
 admin.site.register(Especime, EspecimeAdmin)
 admin.site.register(ClasseQuimica)
 admin.site.register(Especie)
 admin.site.register(Eluente, EluenteAdmin)
 admin.site.register(Aliquota, AliquotaAdmin)
-admin.site.register(Familia)
+admin.site.register(Familia, FamiliaAdmin)
 admin.site.register(Fracao, FracaoAdmin)
 admin.site.register(Fracionamento, FracionamentoAdmin)
 admin.site.register(Genero)
