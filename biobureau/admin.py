@@ -23,7 +23,8 @@ from .models import (
     GeneInfo,
     Database,
     Sequencia,
-    FonteFamilia
+    FonteFamilia,
+    ArquivoFasta
 )
 
 
@@ -107,13 +108,17 @@ class SequenciaAdmin(admin.ModelAdmin):
     )
 
 
-
+class ArquivoFastaInline(admin.TabularInline):
+    model = ArquivoFasta
 
 
 class SequenciamentoAdmin(admin.ModelAdmin):
     list_display = (
         'data', 'algoritmo', 'database'
     )
+    inlines = [
+        ArquivoFastaInline
+    ]
 
 
 class FamiliaAdmin(admin.ModelAdmin):

@@ -195,6 +195,7 @@ class Algoritmo(models.Model):
 
 class GeneOntology(models.Model):
     nome = models.CharField(max_length=200)
+    descricao = models.CharField(max_length=500)
     def __str__(self):
         if self:
             return self.nome
@@ -224,6 +225,11 @@ class Sequenciamento(models.Model):
     def __str__(self):
         if self:
             return str(self.data)
+
+
+class ArquivoFasta(models.Model):
+    sequenciamento = models.ForeignKey('sequenciamento')
+    arquivo_fasta = models.CharField(max_length=1000, null=True, blank=True)
 
 
 class Sequencia(models.Model):
