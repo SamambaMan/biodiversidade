@@ -348,11 +348,11 @@ class Command(BaseCommand):
         nbio = items.count()
         nseqs = Sequencia.objects.all().count()
         print('Começando a brincadeira')
-        pool = Pool(10)
+        pool = Pool(30)
 
         nbloco = 10000
         # particiona em blocos de processamento
-        for bloco in trange(int((nbio-nseqs)/nbloco)):
+        for bloco in trange(int((nbio-nseqs)/nbloco)+1):
             inicio = (bloco*nbloco)+nseqs
             fim = (bloco*nbloco)+nseqs+nbloco
             estes_itens = list(items[inicio:fim])

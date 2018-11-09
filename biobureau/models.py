@@ -195,7 +195,7 @@ class Algoritmo(models.Model):
 
 class GeneOntology(models.Model):
     nome = models.CharField(max_length=200)
-    descricao = models.CharField(max_length=500)
+    descricao = models.CharField(max_length=500, null=True, blank=True)
     def __str__(self):
         if self:
             return self.nome
