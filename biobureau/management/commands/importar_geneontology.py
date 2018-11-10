@@ -6,21 +6,28 @@ from biobureau.models import GeneOntology
 from multiprocessing.dummy import Pool
 
 def importar(linha):
-    go = GeneOntology.objects.filter(nome=linha[0]).first()
-    if go:
-        go.descricao = linha[1]
-        go.save()
+    if linha[4] not in todosgo:
+        return None
+    go = GeneOntology.objects.get(nome=linha[4])
+
+    go.descricao = linha[9]
+    go.save()
+
+todosgo = {}
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('arquivo', nargs=1, type=str)
     
     def handle(self, *args, **options):
+        global todosgo
         print('Contando Linhas: ', end='')
         num_lines = sum([1 for line in open(options['arquivo'][0])])
         print(num_lines)
 
         pool = Pool(10)
+
+        todosgo = GeneOntology.objects.values_list('nome', flat=True )
 
         with open(options['arquivo'][0], 'r') as file:
             reader = csv.reader(file, delimiter='\t')
