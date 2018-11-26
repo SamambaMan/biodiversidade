@@ -24,7 +24,8 @@ from .models import (
     Database,
     Sequencia,
     FonteFamilia,
-    ArquivoFasta
+    ArquivoFasta,
+    Cliente
 )
 
 
@@ -148,3 +149,4 @@ admin.site.register(GeneInfo)
 admin.site.register(Database)
 admin.site.register(Sequencia, SequenciaAdmin)
 admin.site.register(FonteFamilia)
+admin.site.register(Cliente)

@@ -90,6 +90,7 @@ class Especime(models.Model):
         editable=False,
         default=uuid.uuid4
         )
+    cliente = models.ForeignKey('Cliente', null=True, blank=True)
     especie = models.ForeignKey('Especie', verbose_name='Espécie')
     data_da_coleta = models.DateTimeField(blank=True, null=True)
     lat = models.FloatField(blank=True, null=True)
@@ -334,3 +335,10 @@ class Composto(models.Model):
     def __str__(self):
         if self:
             return self.nome_comum
+
+class Cliente(models.Model):
+    nome = models.CharField(max_length=100)
+
+    def __str__(self):
+        if self:
+            return self.nome
